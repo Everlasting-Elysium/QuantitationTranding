@@ -1,0 +1,15 @@
+artifact_uri: file:///document/Code/QuantitationTranding/examples/mlruns/627129439019576967/26c7a043ca174bbc9a674c7996087f0b/artifacts
+end_time: 1758866921125
+entry_point_name: ''
+experiment_id: '627129439019576967'
+lifecycle_stage: active
+run_id: 26c7a043ca174bbc9a674c7996087f0b
+run_name: mlflow_recorder
+run_uuid: 26c7a043ca174bbc9a674c7996087f0b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758866918552
+status: 4
+tags: []
+user_id: elysia
