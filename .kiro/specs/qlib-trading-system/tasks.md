@@ -192,10 +192,10 @@
   - **Property 30: Better models marked as candidates**
   - **Validates: Requirements 7.5**
 
-- [ ] 12. Checkpoint - 确保训练流程测试通过
+- [x] 12. Checkpoint - 确保训练流程测试通过
   - 确保所有测试通过，如有问题请询问用户
 
-- [ ] 13. 实现回测管理器
+- [x] 13. 实现回测管理器
   - 创建BacktestManager类
   - 实现信号生成逻辑
   - 集成qlib回测引擎
@@ -223,7 +223,7 @@
   - **Property 16: Excess returns calculated with benchmark**
   - **Validates: Requirements 4.5**
 
-- [ ] 14. 实现可视化管理器
+- [x] 14. 实现可视化管理器
   - 创建VisualizationManager类
   - 实现累计收益曲线图生成
   - 实现持仓分布图生成

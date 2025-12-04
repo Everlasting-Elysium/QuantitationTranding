@@ -18,6 +18,19 @@ from .model_registry import (
     ModelRegistryError
 )
 
+from .backtest_manager import (
+    BacktestManager,
+    BacktestConfig,
+    BacktestResult,
+    Trade,
+    BacktestManagerError
+)
+
+from .visualization_manager import (
+    VisualizationManager,
+    VisualizationManagerError
+)
+
 __all__ = [
     "TrainingManager",
     "TrainingConfig",
@@ -28,4 +41,11 @@ __all__ = [
     "ModelInfo",
     "ModelFilter",
     "ModelRegistryError",
+    "BacktestManager",
+    "BacktestConfig",
+    "BacktestResult",
+    "Trade",
+    "BacktestManagerError",
+    "VisualizationManager",
+    "VisualizationManagerError",
 ]
