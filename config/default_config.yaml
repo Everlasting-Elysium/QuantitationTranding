@@ -1,0 +1,80 @@
+# Default configuration for Qlib Trading System
+# 量化交易系统默认配置文件
+
+# Qlib configuration
+qlib:
+  provider_uri: "~/.qlib/qlib_data/cn_data"
+  region: "cn"
+  auto_mount: true
+  
+# MLflow configuration
+mlflow:
+  tracking_uri: "./mlruns"
+  experiment_name: "qlib_trading"
+  artifact_location: null
+  
+# Data configuration
+data:
+  instruments: "csi300"  # 股票池: csi300, csi500, all
+  start_time: "2020-01-01"
+  end_time: "2023-12-31"
+  features:
+    - "$close"
+    - "$open"
+    - "$high"
+    - "$low"
+    - "$volume"
+    - "$change"
+  label: "Ref($close, -1) / $close - 1"
+  
+# Training configuration
+training:
+  train_start: "2020-01-01"
+  train_end: "2022-12-31"
+  valid_start: "2023-01-01"
+  valid_end: "2023-06-30"
+  test_start: "2023-07-01"
+  test_end: "2023-12-31"
+  
+# Backtest configuration
+backtest:
+  strategy:
+    topk: 30
+    n_drop: 5
+  executor:
+    time_per_step: "day"
+    generate_portfolio_metrics: true
+  benchmark: "SH000300"  # 沪深300指数
+  
+# Signal generation configuration
+signal:
+  top_k: 30  # 选择前K只股票
+  risk_limits:
+    max_position_per_stock: 0.1  # 单只股票最大持仓比例
+    max_sector_exposure: 0.3  # 单个行业最大暴露
+  
+# Model registry configuration
+model_registry:
+  storage_path: "./models"
+  auto_register: true
+  
+# Logging configuration
+logging:
+  log_dir: "./logs"
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+  
+# Visualization configuration
+visualization:
+  output_dir: "./reports"
+  figure_format: "png"
+  dpi: 300
+  style: "seaborn"
+  
+# CLI configuration
+cli:
+  language: "zh_CN"  # 界面语言
+  show_progress: true
+  confirm_actions: true
