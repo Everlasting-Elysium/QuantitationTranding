@@ -30,7 +30,7 @@
   - 测试无效配置的错误处理
   - _Requirements: 8.3, 8.4_
 
-- [ ] 3. 实现日志系统
+- [x] 3. 实现日志系统
   - 创建LoggerSystem类
   - 实现日志文件轮转功能
   - 配置不同级别的日志输出
@@ -52,7 +52,7 @@
   - **Property 41: Log files rotated when size exceeded**
   - **Validates: Requirements 10.5**
 
-- [ ] 4. 实现Qlib封装层
+- [-] 4. 实现Qlib封装层
   - 创建QlibWrapper类
   - 实现qlib初始化逻辑
   - 实现数据访问接口
