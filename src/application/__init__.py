@@ -31,6 +31,16 @@ from .visualization_manager import (
     VisualizationManagerError
 )
 
+from .report_generator import (
+    ReportGenerator,
+    ReportGeneratorError
+)
+
+from .signal_generator import (
+    SignalGenerator,
+    SignalGeneratorError
+)
+
 __all__ = [
     "TrainingManager",
     "TrainingConfig",
@@ -48,4 +58,8 @@ __all__ = [
     "BacktestManagerError",
     "VisualizationManager",
     "VisualizationManagerError",
+    "ReportGenerator",
+    "ReportGeneratorError",
+    "SignalGenerator",
+    "SignalGeneratorError",
 ]

@@ -243,7 +243,7 @@
   - **Property 21: Multi-model comparison chart generated**
   - **Validates: Requirements 5.5**
 
-- [ ] 15. 实现报告生成器
+- [x] 15. 实现报告生成器
   - 创建ReportGenerator类
   - 实现训练报告生成
   - 实现回测报告生成
@@ -263,7 +263,7 @@
   - **Property 48: Reports include visualizations**
   - **Validates: Requirements 15.4**
 
-- [ ] 16. 实现交易信号生成器
+- [x] 16. 实现交易信号生成器
   - 创建SignalGenerator类
   - 实现基于模型预测的信号生成
   - 实现股票排序和候选列表生成
@@ -287,7 +287,7 @@
   - **Property 25: Signals include all action types**
   - **Validates: Requirements 6.4**
 
-- [ ] 17. 实现信号解释功能
+- [x] 17. 实现信号解释功能
   - 扩展SignalGenerator添加解释功能
   - 实现特征重要性分析
   - 实现通俗语言描述生成
@@ -310,7 +310,7 @@
   - **Property 49: High-risk predictions marked with warnings**
   - **Validates: Requirements 15.5**
 
-- [ ] 18. Checkpoint - 确保核心功能测试通过
+- [x] 18. Checkpoint - 确保核心功能测试通过
   - 确保所有测试通过，如有问题请询问用户
 
 - [ ] 19. 实现交互式提示系统
