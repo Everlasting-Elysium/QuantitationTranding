@@ -67,7 +67,7 @@
   - **Property 2: Data validation returns time range after initialization**
   - **Validates: Requirements 1.3**
 
-- [ ] 5. 实现数据管理器
+- [x] 5. 实现数据管理器
   - 创建DataManager类
   - 实现数据下载功能
   - 实现数据验证和完整性检查
@@ -86,7 +86,7 @@
   - **Property 36: Missing values handled by strategy**
   - **Validates: Requirements 9.5**
 
-- [ ] 6. 实现MLflow集成
+- [x] 6. 实现MLflow集成
   - 创建MLflowTracker类
   - 实现实验创建和运行管理
   - 实现参数和指标记录功能
@@ -105,7 +105,7 @@
   - **Property 10: Hyperparameters logged to MLflow**
   - **Validates: Requirements 3.3**
 
-- [ ] 7. Checkpoint - 确保所有基础设施测试通过
+- [x] 7. Checkpoint - 确保所有基础设施测试通过
   - 确保所有测试通过，如有问题请询问用户
 
 - [ ] 8. 实现模型模板系统
@@ -439,3 +439,339 @@
 
 - [ ] 31. Final Checkpoint - 确保所有测试通过
   - 确保所有测试通过，如有问题请询问用户
+
+## 新增功能任务 (New Feature Tasks) [NEW]
+
+### Phase 1: 市场选择和智能推荐 (Market Selection and Intelligent Recommendation)
+
+- [ ] 32. 实现市场选择器 (Implement Market Selector)
+  - 创建MarketSelector类 / Create MarketSelector class
+  - 实现市场配置加载（国内/国外）/ Implement market configuration loading (domestic/international)
+  - 实现资产类型管理（股票/基金/ETF）/ Implement asset type management (stocks/funds/ETFs)
+  - 添加市场数据源配置 / Add market data source configuration
+  - _Requirements: 16.1, 16.2, 16.3_
+
+- [ ]* 32.1 编写市场选择的单元测试 (Write unit tests for market selection)
+  - 测试市场列表获取 / Test market list retrieval
+  - 测试资产类型获取 / Test asset type retrieval
+  - 测试市场切换功能 / Test market switching functionality
+  - _Requirements: 16.1, 16.2, 16.5_
+
+- [ ] 33. 实现历史表现分析器 (Implement Performance Analyzer)
+  - 创建PerformanceAnalyzer类 / Create PerformanceAnalyzer class
+  - 实现3年历史数据分析 / Implement 3-year historical data analysis
+  - 计算关键指标（收益率、夏普比率、最大回撤）/ Calculate key metrics (returns, Sharpe ratio, max drawdown)
+  - 实现资产排名算法 / Implement asset ranking algorithm
+  - 生成推荐列表 / Generate recommendation list
+  - _Requirements: 17.1, 17.2, 17.3_
+
+- [ ]* 33.1 编写表现分析的单元测试 (Write unit tests for performance analysis)
+  - 测试历史数据分析 / Test historical data analysis
+  - 测试指标计算准确性 / Test metric calculation accuracy
+  - 测试推荐算法 / Test recommendation algorithm
+  - _Requirements: 17.1, 17.2_
+
+- [ ]* 33.2 编写推荐验证的属性测试 (Write property tests for recommendation validation)
+  - 验证推荐资产的相关性 / Validate correlation of recommended assets
+  - 验证组合分散度 / Validate portfolio diversification
+  - _Requirements: 17.4_
+
+### Phase 2: 策略优化 (Strategy Optimization)
+
+- [ ] 34. 实现策略优化器 (Implement Strategy Optimizer)
+  - 创建StrategyOptimizer类 / Create StrategyOptimizer class
+  - 实现目标收益率验证 / Implement target return validation
+  - 实现多目标优化算法 / Implement multi-objective optimization algorithm
+  - 实现风险偏好调整 / Implement risk preference adjustment
+  - 生成优化后的资产配置 / Generate optimized asset allocation
+  - _Requirements: 18.1, 18.2, 18.3, 18.4_
+
+- [ ]* 34.1 编写优化算法的单元测试 (Write unit tests for optimization algorithm)
+  - 测试目标收益率验证 / Test target return validation
+  - 测试优化约束条件 / Test optimization constraints
+  - 测试资产配置生成 / Test asset allocation generation
+  - _Requirements: 18.1, 18.3, 18.4_
+
+- [ ]* 34.2 编写优化结果的属性测试 (Write property tests for optimization results)
+  - 验证优化结果满足约束 / Validate optimization results meet constraints
+  - 验证风险收益平衡 / Validate risk-return balance
+  - _Requirements: 18.2, 18.3_
+
+- [ ] 35. 增强训练管理器支持目标导向训练 (Enhance Training Manager for target-oriented training)
+  - 扩展TrainingManager类 / Extend TrainingManager class
+  - 集成StrategyOptimizer / Integrate StrategyOptimizer
+  - 实现基于目标收益率的参数调整 / Implement parameter adjustment based on target returns
+  - 添加优化结果记录到MLflow / Add optimization results logging to MLflow
+  - _Requirements: 18.3, 18.4_
+
+### Phase 3: 投资组合和风险管理 (Portfolio and Risk Management)
+
+- [ ] 36. 实现投资组合管理器 (Implement Portfolio Manager)
+  - 创建PortfolioManager类 / Create PortfolioManager class
+  - 实现持仓创建和更新 / Implement position creation and updates
+  - 实现组合价值计算 / Implement portfolio value calculation
+  - 实现交易历史记录 / Implement trade history tracking
+  - 实现收益率计算 / Implement returns calculation
+  - _Requirements: 19.3, 20.3_
+
+- [ ]* 36.1 编写组合管理的单元测试 (Write unit tests for portfolio management)
+  - 测试持仓更新 / Test position updates
+  - 测试价值计算 / Test value calculation
+  - 测试收益率计算 / Test returns calculation
+  - _Requirements: 19.3, 20.3_
+
+- [ ] 37. 实现风险管理器 (Implement Risk Manager)
+  - 创建RiskManager类 / Create RiskManager class
+  - 实现持仓风险检查 / Implement position risk checks
+  - 实现VaR计算 / Implement VaR calculation
+  - 实现最大回撤监控 / Implement max drawdown monitoring
+  - 实现集中度风险检查 / Implement concentration risk checks
+  - 实现风险预警生成 / Implement risk alert generation
+  - _Requirements: 20.2, 20.4, 21.4_
+
+- [ ]* 37.1 编写风险检查的单元测试 (Write unit tests for risk checks)
+  - 测试持仓风险检查 / Test position risk checks
+  - 测试VaR计算 / Test VaR calculation
+  - 测试风险预警触发 / Test risk alert triggering
+  - _Requirements: 20.2, 20.4_
+
+- [ ]* 37.2 编写风险管理的属性测试 (Write property tests for risk management)
+  - 验证风险限制始终被遵守 / Validate risk limits are always respected
+  - 验证风险预警及时触发 / Validate risk alerts trigger timely
+  - _Requirements: 20.2, 20.4, 21.4_
+
+### Phase 4: 模拟交易引擎 (Simulation Trading Engine)
+
+- [ ] 38. 实现模拟交易引擎 (Implement Simulation Engine)
+  - 创建SimulationEngine类 / Create SimulationEngine class
+  - 实现模拟会话管理 / Implement simulation session management
+  - 实现每日信号生成和执行 / Implement daily signal generation and execution
+  - 实现模拟持仓跟踪 / Implement simulated position tracking
+  - 实现模拟收益计算 / Implement simulated returns calculation
+  - 生成模拟报告 / Generate simulation reports
+  - _Requirements: 19.1, 19.2, 19.3, 19.4_
+
+- [ ]* 38.1 编写模拟交易的单元测试 (Write unit tests for simulation trading)
+  - 测试会话创建 / Test session creation
+  - 测试信号执行 / Test signal execution
+  - 测试持仓更新 / Test position updates
+  - 测试收益计算 / Test returns calculation
+  - _Requirements: 19.1, 19.2, 19.3_
+
+- [ ]* 38.2 编写模拟报告的单元测试 (Write unit tests for simulation reports)
+  - 测试报告生成 / Test report generation
+  - 测试指标计算 / Test metrics calculation
+  - _Requirements: 19.4_
+
+- [ ] 39. 集成模拟交易到CLI (Integrate simulation trading into CLI)
+  - 在MainCLI中添加模拟交易菜单 / Add simulation trading menu to MainCLI
+  - 实现模拟参数输入界面 / Implement simulation parameter input interface
+  - 实现模拟进度显示 / Implement simulation progress display
+  - 实现模拟结果查看 / Implement simulation results viewing
+  - 提供参数调整和重新测试选项 / Provide parameter adjustment and retest options
+  - _Requirements: 19.1, 19.4, 19.5_
+
+### Phase 5: 实盘交易系统 (Live Trading System)
+
+- [ ] 40. 实现交易API适配器 (Implement Trading API Adapter)
+  - 创建TradingAPIAdapter类 / Create TradingAPIAdapter class
+  - 实现券商连接接口 / Implement broker connection interface
+  - 实现订单下单功能 / Implement order placement functionality
+  - 实现订单查询和取消 / Implement order query and cancellation
+  - 实现账户信息查询 / Implement account information query
+  - 实现持仓查询 / Implement position query
+  - _Requirements: 20.1, 20.3_
+
+- [ ]* 40.1 编写交易API的单元测试 (Write unit tests for trading API)
+  - 测试连接功能 / Test connection functionality
+  - 测试订单操作 / Test order operations
+  - 测试查询功能 / Test query functionality
+  - _Requirements: 20.1, 20.3_
+
+- [ ] 41. 实现实盘交易管理器 (Implement Live Trading Manager)
+  - 创建LiveTradingManager类 / Create LiveTradingManager class
+  - 实现交易会话管理 / Implement trading session management
+  - 集成RiskManager进行风险检查 / Integrate RiskManager for risk checks
+  - 实现订单执行逻辑 / Implement order execution logic
+  - 实现持仓实时更新 / Implement real-time position updates
+  - 实现交易暂停和恢复 / Implement trading pause and resume
+  - _Requirements: 20.1, 20.2, 20.3, 20.4, 20.5_
+
+- [ ]* 41.1 编写实盘交易的单元测试 (Write unit tests for live trading)
+  - 测试会话管理 / Test session management
+  - 测试风险检查集成 / Test risk check integration
+  - 测试订单执行 / Test order execution
+  - 测试暂停恢复功能 / Test pause/resume functionality
+  - _Requirements: 20.1, 20.2, 20.3, 20.4_
+
+- [ ]* 41.2 编写实盘交易的集成测试 (Write integration tests for live trading)
+  - 测试完整交易流程 / Test complete trading workflow
+  - 测试风险预警触发 / Test risk alert triggering
+  - 测试异常情况处理 / Test exception handling
+  - _Requirements: 20.2, 20.4, 20.5_
+
+- [ ] 42. 集成实盘交易到CLI (Integrate live trading into CLI)
+  - 在MainCLI中添加实盘交易菜单 / Add live trading menu to MainCLI
+  - 实现券商配置界面 / Implement broker configuration interface
+  - 实现交易参数设置 / Implement trading parameter settings
+  - 实现实时状态监控 / Implement real-time status monitoring
+  - 实现交易控制（启动/暂停/停止）/ Implement trading controls (start/pause/stop)
+  - _Requirements: 20.1, 20.3, 20.4_
+
+### Phase 6: 通知和报告系统 (Notification and Reporting System)
+
+- [ ] 43. 实现通知服务 (Implement Notification Service)
+  - 创建NotificationService类 / Create NotificationService class
+  - 实现邮件通知功能 / Implement email notification functionality
+  - 实现短信通知功能 / Implement SMS notification functionality
+  - 实现系统通知功能 / Implement system notification functionality
+  - 实现风险预警通知 / Implement risk alert notifications
+  - _Requirements: 21.1, 21.2, 21.3, 21.4, 21.5_
+
+- [ ]* 43.1 编写通知服务的单元测试 (Write unit tests for notification service)
+  - 测试邮件发送 / Test email sending
+  - 测试短信发送 / Test SMS sending
+  - 测试通知格式 / Test notification formatting
+  - _Requirements: 21.5_
+
+- [ ] 44. 实现报告调度器 (Implement Report Scheduler)
+  - 创建ReportScheduler类 / Create ReportScheduler class
+  - 实现每日报告生成 / Implement daily report generation
+  - 实现每周报告生成 / Implement weekly report generation
+  - 实现每月报告生成 / Implement monthly report generation
+  - 实现风险预警报告 / Implement risk alert reports
+  - 集成NotificationService / Integrate NotificationService
+  - _Requirements: 21.1, 21.2, 21.3, 21.4, 21.5_
+
+- [ ]* 44.1 编写报告调度的单元测试 (Write unit tests for report scheduling)
+  - 测试定时任务触发 / Test scheduled task triggering
+  - 测试报告生成 / Test report generation
+  - 测试通知发送 / Test notification sending
+  - _Requirements: 21.1, 21.2, 21.3_
+
+- [ ] 45. 增强报告生成器支持新报告类型 (Enhance Report Generator for new report types)
+  - 扩展ReportGenerator类 / Extend ReportGenerator class
+  - 实现模拟交易报告生成 / Implement simulation trading report generation
+  - 实现实盘交易报告生成 / Implement live trading report generation
+  - 实现对比报告生成 / Implement comparison report generation
+  - 添加中英双语报告支持 / Add bilingual report support
+  - _Requirements: 19.4, 20.5, 21.1, 21.2, 21.3_
+
+### Phase 7: 引导式工作流程 (Guided Workflow)
+
+- [ ] 46. 实现引导式工作流程 (Implement Guided Workflow)
+  - 创建GuidedWorkflow类 / Create GuidedWorkflow class
+  - 实现10步完整流程 / Implement 10-step complete workflow
+  - 实现进度保存和恢复 / Implement progress save and resume
+  - 实现步骤验证 / Implement step validation
+  - 实现返回修改功能 / Implement go-back-to-modify functionality
+  - 生成配置总结 / Generate configuration summary
+  - _Requirements: 22.1, 22.2, 22.3, 22.4, 22.5_
+
+- [ ]* 46.1 编写工作流程的单元测试 (Write unit tests for workflow)
+  - 测试步骤流转 / Test step transitions
+  - 测试进度保存 / Test progress saving
+  - 测试验证逻辑 / Test validation logic
+  - 测试返回功能 / Test go-back functionality
+  - _Requirements: 22.1, 22.2, 22.4_
+
+- [ ]* 46.2 编写工作流程的集成测试 (Write integration tests for workflow)
+  - 测试完整流程执行 / Test complete workflow execution
+  - 测试中断恢复 / Test interruption and resume
+  - 测试错误处理 / Test error handling
+  - _Requirements: 22.1, 22.2, 22.3, 22.4_
+
+- [ ] 47. 集成引导式工作流程到CLI (Integrate guided workflow into CLI)
+  - 在MainCLI中添加引导模式入口 / Add guided mode entry to MainCLI
+  - 实现友好的中文提示 / Implement friendly Chinese prompts
+  - 实现实时输入验证 / Implement real-time input validation
+  - 实现进度可视化 / Implement progress visualization
+  - 添加帮助和说明 / Add help and instructions
+  - _Requirements: 22.1, 22.2, 22.3, 22.5_
+
+### Phase 8: 文档和示例 (Documentation and Examples)
+
+- [ ] 48. 编写引导式工作流程文档 (Write guided workflow documentation)
+  - 编写docs/guided_workflow.md / Write docs/guided_workflow.md
+  - 详细说明10步流程 / Detail the 10-step process
+  - 添加截图和示例 / Add screenshots and examples
+  - 提供常见问题解答 / Provide FAQ
+  - _Requirements: 13.1, 13.2, 13.3, 22.1_
+
+- [ ] 49. 编写模拟交易指南 (Write simulation trading guide)
+  - 编写docs/simulation_guide.md / Write docs/simulation_guide.md
+  - 说明模拟交易流程 / Explain simulation trading process
+  - 提供参数调整建议 / Provide parameter adjustment suggestions
+  - 添加结果解读说明 / Add result interpretation instructions
+  - _Requirements: 13.2, 13.3, 19.1, 19.4_
+
+- [ ] 50. 编写实盘交易指南 (Write live trading guide)
+  - 编写docs/live_trading_guide.md / Write docs/live_trading_guide.md
+  - 说明券商配置步骤 / Explain broker configuration steps
+  - 详细说明风险控制机制 / Detail risk control mechanisms
+  - 提供安全使用建议 / Provide safe usage recommendations
+  - 添加故障排除指南 / Add troubleshooting guide
+  - _Requirements: 13.2, 13.3, 20.1, 20.2_
+
+- [ ] 51. 创建完整示例 (Create complete examples)
+  - 创建examples/guided_workflow_demo.py / Create examples/guided_workflow_demo.py
+  - 创建examples/simulation_demo.py / Create examples/simulation_demo.py
+  - 创建examples/live_trading_demo.py / Create examples/live_trading_demo.py
+  - 添加详细注释和说明 / Add detailed comments and instructions
+  - _Requirements: 13.5, 22.1_
+
+### Phase 9: 配置和数据 (Configuration and Data)
+
+- [ ] 52. 创建市场配置文件 (Create market configuration files)
+  - 创建config/markets.yaml / Create config/markets.yaml
+  - 配置国内市场（A股）/ Configure domestic market (A-shares)
+  - 配置国外市场（美股、港股）/ Configure international markets (US, HK stocks)
+  - 配置资产类型 / Configure asset types
+  - _Requirements: 16.1, 16.2_
+
+- [ ] 53. 创建风险阈值配置 (Create risk threshold configuration)
+  - 创建config/risk_thresholds.yaml / Create config/risk_thresholds.yaml
+  - 配置不同风险偏好的阈值 / Configure thresholds for different risk preferences
+  - 配置预警级别 / Configure alert levels
+  - _Requirements: 18.2, 20.2, 21.4_
+
+- [ ] 54. 创建通知配置 (Create notification configuration)
+  - 创建config/notification_config.yaml / Create config/notification_config.yaml
+  - 配置邮件服务器 / Configure email server
+  - 配置短信服务 / Configure SMS service
+  - _Requirements: 21.5_
+
+### Phase 10: 最终集成和测试 (Final Integration and Testing)
+
+- [ ] 55. 端到端集成测试 (End-to-end integration testing)
+  - 测试完整引导式工作流程 / Test complete guided workflow
+  - 测试市场选择到模拟交易 / Test market selection to simulation trading
+  - 测试模拟交易到实盘交易 / Test simulation trading to live trading
+  - 测试报告生成和通知 / Test report generation and notifications
+  - _Requirements: All new requirements_
+
+- [ ]* 55.1 编写端到端测试套件 (Write end-to-end test suite)
+  - 测试用户完整使用场景 / Test complete user scenarios
+  - 测试异常情况处理 / Test exception handling
+  - 测试性能和稳定性 / Test performance and stability
+  - _Requirements: All new requirements_
+
+- [ ] 56. 性能优化 (Performance optimization)
+  - 优化历史数据分析性能 / Optimize historical data analysis performance
+  - 优化策略优化算法 / Optimize strategy optimization algorithm
+  - 优化实时数据处理 / Optimize real-time data processing
+  - 添加缓存机制 / Add caching mechanisms
+  - _Requirements: 17.1, 18.3, 20.3_
+
+- [ ] 57. 用户体验优化 (User experience optimization)
+  - 优化中文提示信息 / Optimize Chinese prompts
+  - 添加更多帮助信息 / Add more help information
+  - 优化进度显示 / Optimize progress display
+  - 添加操作确认 / Add operation confirmations
+  - _Requirements: 12.1, 12.4, 22.3_
+
+- [ ] 58. Final Checkpoint - 新功能测试通过 (Final Checkpoint - New features tests pass)
+  - 确保所有新功能测试通过 / Ensure all new feature tests pass
+  - 确保向后兼容性 / Ensure backward compatibility
+  - 生成完整测试报告 / Generate complete test report
+  - 如有问题请询问用户 / Ask user if there are any issues

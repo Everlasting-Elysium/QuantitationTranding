@@ -109,10 +109,11 @@ class TestQlibWrapper:
             'volume': [1000, 1100, 1200]
         })
         
-        # 模拟D模块
-        with patch('qlib.data.D') as mock_d:
-            mock_d.features.return_value = mock_data
-            
+        # 模拟D模块 - 需要模拟整个D对象
+        mock_d = MagicMock()
+        mock_d.features.return_value = mock_data
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -145,9 +146,10 @@ class TestQlibWrapper:
     def test_get_data_exception(self):
         """测试获取数据异常"""
         # 模拟D.features抛出异常
-        with patch('qlib.data.D') as mock_d:
-            mock_d.features.side_effect = Exception("data error")
-            
+        mock_d = MagicMock()
+        mock_d.features.side_effect = Exception("data error")
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -165,9 +167,10 @@ class TestQlibWrapper:
         """测试获取股票列表成功"""
         mock_instruments = ["000001.SZ", "000002.SZ", "600000.SH"]
         
-        with patch('qlib.data.D') as mock_d:
-            mock_d.instruments.return_value = mock_instruments
-            
+        mock_d = MagicMock()
+        mock_d.instruments.return_value = mock_instruments
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -193,9 +196,10 @@ class TestQlibWrapper:
             pd.Timestamp("2023-01-05")
         ]
         
-        with patch('qlib.data.D') as mock_d:
-            mock_d.calendar.return_value = mock_calendar
-            
+        mock_d = MagicMock()
+        mock_d.calendar.return_value = mock_calendar
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -229,10 +233,11 @@ class TestQlibWrapper:
             'close': [100, 101]
         })
         
-        with patch('qlib.data.D') as mock_d:
-            mock_d.calendar.return_value = mock_calendar
-            mock_d.features.return_value = mock_data
-            
+        mock_d = MagicMock()
+        mock_d.calendar.return_value = mock_calendar
+        mock_d.features.return_value = mock_data
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -258,9 +263,10 @@ class TestQlibWrapper:
     
     def test_validate_data_empty_calendar(self):
         """测试验证数据 - 空交易日历"""
-        with patch('qlib.data.D') as mock_d:
-            mock_d.calendar.return_value = []
-            
+        mock_d = MagicMock()
+        mock_d.calendar.return_value = []
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -276,10 +282,11 @@ class TestQlibWrapper:
             pd.Timestamp("2023-12-29")
         ]
         
-        with patch('qlib.data.D') as mock_d:
-            mock_d.calendar.return_value = mock_calendar
-            mock_d.features.return_value = pd.DataFrame()  # 空DataFrame
-            
+        mock_d = MagicMock()
+        mock_d.calendar.return_value = mock_calendar
+        mock_d.features.return_value = pd.DataFrame()  # 空DataFrame
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -296,9 +303,10 @@ class TestQlibWrapper:
             pd.Timestamp("2023-12-29")
         ]
         
-        with patch('qlib.data.D') as mock_d:
-            mock_d.calendar.return_value = mock_calendar
-            
+        mock_d = MagicMock()
+        mock_d.calendar.return_value = mock_calendar
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             wrapper._provider_uri = "/path/to/data"
@@ -324,9 +332,10 @@ class TestQlibWrapper:
     
     def test_get_data_info_no_calendar(self):
         """测试获取数据信息 - 无交易日历"""
-        with patch('qlib.data.D') as mock_d:
-            mock_d.calendar.return_value = []
-            
+        mock_d = MagicMock()
+        mock_d.calendar.return_value = []
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -354,9 +363,10 @@ class TestQlibWrapper:
     
     def test_get_data_with_empty_result(self):
         """测试获取数据返回空结果"""
-        with patch('qlib.data.D') as mock_d:
-            mock_d.features.return_value = pd.DataFrame()  # 空DataFrame
-            
+        mock_d = MagicMock()
+        mock_d.features.return_value = pd.DataFrame()  # 空DataFrame
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             
@@ -373,9 +383,10 @@ class TestQlibWrapper:
     
     def test_get_data_with_none_result(self):
         """测试获取数据返回None"""
-        with patch('qlib.data.D') as mock_d:
-            mock_d.features.return_value = None
-            
+        mock_d = MagicMock()
+        mock_d.features.return_value = None
+        
+        with patch.dict('sys.modules', {'qlib.data': MagicMock(D=mock_d)}):
             wrapper = QlibWrapper()
             wrapper._initialized = True
             

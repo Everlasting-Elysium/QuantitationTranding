@@ -21,6 +21,14 @@ from .config_manager import (
     CLIConfig
 )
 
+from .data_manager import (
+    DataManager,
+    DataManagerError,
+    MissingValueStrategy,
+    ValidationResult,
+    DataInfo
+)
+
 __all__ = [
     'ConfigManager',
     'Config',
@@ -36,5 +44,10 @@ __all__ = [
     'ModelRegistryConfig',
     'LoggingConfig',
     'VisualizationConfig',
-    'CLIConfig'
+    'CLIConfig',
+    'DataManager',
+    'DataManagerError',
+    'MissingValueStrategy',
+    'ValidationResult',
+    'DataInfo'
 ]

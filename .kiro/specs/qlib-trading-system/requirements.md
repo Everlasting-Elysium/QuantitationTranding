@@ -1,20 +1,67 @@
-# Requirements Document
+# Requirements Document (需求文档)
 
-## Introduction
+## Introduction (简介)
 
-本文档定义了一个基于qlib的量化交易系统的需求。该系统将提供模型训练、训练过程监控、模型评估以及基于模型预测的股票交易功能。系统将支持中国A股市场，使用qlib框架进行数据处理和模型训练，使用MLflow进行实验管理和模型追踪。
+本文档定义了一个基于qlib的智能量化交易系统的需求。该系统将提供从市场选择、智能推荐、策略优化、模型训练、历史回测、模拟交易到实盘交易的完整解决方案。系统支持多个市场（中国A股、美股等）和多种投资品类（股票、基金、ETF等），使用qlib框架进行数据处理和模型训练，使用MLflow进行实验管理和模型追踪。
 
-## Glossary
+**This document defines the requirements for an intelligent quantitative trading system based on qlib. The system provides a complete solution from market selection, intelligent recommendations, strategy optimization, model training, historical backtesting, simulation trading to live trading. The system supports multiple markets (China A-shares, US stocks, etc.) and various asset types (stocks, funds, ETFs, etc.), uses the qlib framework for data processing and model training, and uses MLflow for experiment management and model tracking.**
 
-- **System**: 指本量化交易系统
-- **qlib**: 微软开源的AI量化投资平台
-- **MLflow**: 开源的机器学习生命周期管理平台
-- **Training Pipeline**: 模型训练流程，包括数据准备、特征工程、模型训练和评估
-- **Backtest**: 回测，使用历史数据测试交易策略的表现
-- **Portfolio**: 投资组合，包含多个股票持仓
-- **Signal**: 交易信号，模型输出的买入/卖出建议
-- **Experiment**: 实验，一次完整的模型训练和评估过程
-- **Model Registry**: 模型注册表，存储和管理训练好的模型
+### 核心功能 (Core Features)
+
+1. **智能引导式交互** - 无需编程，通过问答完成所有配置
+   **Intelligent Guided Interaction** - No programming required, complete all configurations through Q&A
+
+2. **多市场多品类支持** - 支持国内外股票、基金等多种投资品类
+   **Multi-market Multi-asset Support** - Supports domestic and international stocks, funds, and other investment categories
+
+3. **智能推荐系统** - 基于历史表现自动推荐优质标的
+   **Intelligent Recommendation System** - Automatically recommends quality assets based on historical performance
+
+4. **目标导向优化** - 根据用户期望收益率优化策略参数
+   **Target-oriented Optimization** - Optimizes strategy parameters based on user's target returns
+
+5. **完整的测试流程** - 历史回测 + 模拟交易双重验证
+   **Complete Testing Process** - Historical backtesting + simulation trading dual verification
+
+6. **实盘交易支持** - 无缝对接实盘交易接口，提供完善的风险控制
+   **Live Trading Support** - Seamlessly integrates with live trading APIs with comprehensive risk control
+
+7. **自动化报告** - 定期生成收益分析和风险预警
+   **Automated Reporting** - Periodically generates performance analysis and risk alerts
+
+## Glossary (术语表)
+
+### 基础术语 (Basic Terms)
+- **System (系统)**: 指本量化交易系统 / Refers to this quantitative trading system
+- **qlib**: 微软开源的AI量化投资平台 / Microsoft's open-source AI quantitative investment platform
+- **MLflow**: 开源的机器学习生命周期管理平台 / Open-source machine learning lifecycle management platform
+
+### 交易相关 (Trading Related)
+- **Market (市场)**: 投资市场，如中国A股、美股等 / Investment market, such as China A-shares, US stocks, etc.
+- **Asset Type (资产类型)**: 投资品类，如股票、基金、ETF等 / Investment category, such as stocks, funds, ETFs, etc.
+- **Portfolio (投资组合)**: 包含多个股票持仓的投资组合 / Investment portfolio containing multiple stock positions
+- **Position (持仓)**: 当前持有的某只股票的数量和成本 / Current holdings of a stock with quantity and cost
+- **Signal (交易信号)**: 模型输出的买入/卖出建议 / Buy/sell recommendations output by the model
+- **Trade (交易)**: 一次买入或卖出操作 / A single buy or sell operation
+
+### 模型相关 (Model Related)
+- **Training Pipeline (训练流程)**: 模型训练流程，包括数据准备、特征工程、模型训练和评估 / Model training process including data preparation, feature engineering, training and evaluation
+- **Experiment (实验)**: 一次完整的模型训练和评估过程 / A complete model training and evaluation process
+- **Model Registry (模型注册表)**: 存储和管理训练好的模型 / Storage and management of trained models
+- **Backtest (回测)**: 使用历史数据测试交易策略的表现 / Testing trading strategy performance using historical data
+
+### 新增术语 (New Terms)
+- **Simulation Trading (模拟交易)**: 使用真实市场数据进行模拟交易测试，不涉及真实资金 / Simulated trading using real market data without real money
+- **Live Trading (实盘交易)**: 使用真实资金进行实际交易 / Actual trading with real money
+- **Performance Analyzer (表现分析器)**: 分析历史市场表现并推荐优质标的的模块 / Module that analyzes historical market performance and recommends quality assets
+- **Strategy Optimizer (策略优化器)**: 根据目标收益率优化策略参数的模块 / Module that optimizes strategy parameters based on target returns
+- **Risk Manager (风险管理器)**: 监控和控制交易风险的模块 / Module that monitors and controls trading risks
+- **Target Return (目标收益率)**: 用户期望达到的年化收益率 / User's expected annualized return rate
+- **Risk Preference (风险偏好)**: 用户的风险承受能力，分为保守型、稳健型、进取型 / User's risk tolerance: conservative, moderate, aggressive
+- **Sharpe Ratio (夏普比率)**: 衡量风险调整后收益的指标 / Metric measuring risk-adjusted returns
+- **Max Drawdown (最大回撤)**: 投资组合从峰值到谷底的最大跌幅 / Maximum decline from peak to trough in portfolio value
+- **Stop Loss (止损)**: 当亏损达到一定比例时自动卖出以限制损失 / Automatic sell when loss reaches certain percentage to limit losses
+- **Position Sizing (仓位管理)**: 控制每只股票的持仓比例 / Controlling the proportion of each stock in portfolio
 
 ## Requirements
 
@@ -196,3 +243,129 @@
 3. WHEN 展示预测结果时 THEN System SHALL 使用通俗语言解释技术指标
 4. WHEN 生成报告时 THEN System SHALL 包含图表和可视化说明
 5. WHERE 预测风险较高时 THEN System SHALL 明确标注风险警告
+
+### Requirement 16 [NEW]
+
+**User Story (用户故事):** 作为投资者，我希望系统能够支持多个市场和投资品类的选择，以便根据我的投资偏好进行配置。
+**As an investor, I want the system to support multiple markets and asset types, so that I can configure based on my investment preferences.**
+
+#### Acceptance Criteria (验收标准)
+
+1. WHEN 用户启动系统时 THEN System SHALL 提供市场选择界面（国内/国外）
+   **When user starts the system, the system shall provide market selection interface (domestic/international)**
+2. WHEN 用户选择市场后 THEN System SHALL 显示该市场支持的投资品类（股票/基金/ETF等）
+   **When user selects a market, the system shall display supported asset types for that market (stocks/funds/ETFs, etc.)**
+3. WHEN 用户选择品类后 THEN System SHALL 加载对应的数据源和配置
+   **When user selects an asset type, the system shall load corresponding data sources and configurations**
+4. WHERE 市场数据不可用时 THEN System SHALL 提供清晰的错误提示和数据下载指引
+   **Where market data is unavailable, the system shall provide clear error messages and data download guidance**
+5. WHEN 用户切换市场时 THEN System SHALL 保存当前配置并切换到新市场环境
+   **When user switches markets, the system shall save current configuration and switch to new market environment**
+
+### Requirement 17 [NEW]
+
+**User Story (用户故事):** 作为投资者，我希望系统能够基于历史表现推荐优质标的，以便我做出更明智的投资决策。
+**As an investor, I want the system to recommend high-quality assets based on historical performance, so that I can make smarter investment decisions.**
+
+#### Acceptance Criteria (验收标准)
+
+1. WHEN 用户选择市场和品类后 THEN System SHALL 分析近3年该品类的市场表现
+   **When user selects market and asset type, the system shall analyze 3-year historical performance for that category**
+2. WHEN 分析完成时 THEN System SHALL 根据多个指标（收益率、夏普比率、最大回撤等）推荐前10名标的
+   **When analysis completes, the system shall recommend top 10 assets based on multiple metrics (returns, Sharpe ratio, max drawdown, etc.)**
+3. WHEN 显示推荐列表时 THEN System SHALL 展示每个标的的关键指标和推荐理由
+   **When displaying recommendation list, the system shall show key metrics and recommendation reasons for each asset**
+4. WHERE 用户选择多个标的时 THEN System SHALL 验证组合的相关性和分散度
+   **Where user selects multiple assets, the system shall validate portfolio correlation and diversification**
+5. WHEN 用户确认选择时 THEN System SHALL 保存选定的标的列表用于后续训练
+   **When user confirms selection, the system shall save selected assets list for subsequent training**
+
+### Requirement 18 [NEW]
+
+**User Story (用户故事):** 作为投资者，我希望能够设定期望收益率目标，系统自动优化策略参数以达到目标。
+**As an investor, I want to set target return goals, and have the system automatically optimize strategy parameters to achieve the target.**
+
+#### Acceptance Criteria (验收标准)
+
+1. WHEN 用户输入期望年化收益率时 THEN System SHALL 验证目标的合理性（基于历史数据）
+   **When user inputs target annual return, the system shall validate target reasonableness (based on historical data)**
+2. WHEN 用户选择风险偏好时 THEN System SHALL 根据风险偏好调整优化约束条件
+   **When user selects risk preference, the system shall adjust optimization constraints based on risk preference**
+3. WHEN 开始优化时 THEN System SHALL 使用多目标优化算法平衡收益和风险
+   **When optimization starts, the system shall use multi-objective optimization to balance returns and risk**
+4. WHEN 优化完成时 THEN System SHALL 展示预期收益、预期风险和建议的资产配置
+   **When optimization completes, the system shall display expected returns, expected risk, and recommended asset allocation**
+5. WHERE 目标无法达成时 THEN System SHALL 提供最接近的可行方案和调整建议
+   **Where target cannot be achieved, the system shall provide closest feasible solution and adjustment suggestions**
+
+### Requirement 19 [NEW]
+
+**User Story (用户故事):** 作为投资者，我希望在实盘交易前进行模拟交易测试，以便验证策略的实际效果。
+**As an investor, I want to conduct simulation trading before live trading, so that I can verify the strategy's actual effectiveness.**
+
+#### Acceptance Criteria (验收标准)
+
+1. WHEN 用户启动模拟交易时 THEN System SHALL 使用最新市场数据进行前向测试
+   **When user starts simulation trading, the system shall use latest market data for forward testing**
+2. WHEN 模拟交易运行时 THEN System SHALL 每日生成交易信号并模拟执行
+   **When simulation trading runs, the system shall generate daily trading signals and simulate execution**
+3. WHEN 模拟交易进行中 THEN System SHALL 实时更新持仓价值和收益情况
+   **When simulation trading is in progress, the system shall update position values and returns in real-time**
+4. WHEN 模拟周期结束时 THEN System SHALL 生成详细的模拟报告（收益、风险、交易明细）
+   **When simulation period ends, the system shall generate detailed simulation report (returns, risk, trade details)**
+5. WHERE 模拟结果不理想时 THEN System SHALL 提供参数调整建议和重新测试选项
+   **Where simulation results are unsatisfactory, the system shall provide parameter adjustment suggestions and retest options**
+
+### Requirement 20 [NEW]
+
+**User Story (用户故事):** 作为投资者，我希望系统能够执行实盘交易，并提供完善的风险控制机制。
+**As an investor, I want the system to execute live trading with comprehensive risk control mechanisms.**
+
+#### Acceptance Criteria (验收标准)
+
+1. WHEN 用户启动实盘交易时 THEN System SHALL 连接到券商交易接口并验证账户信息
+   **When user starts live trading, the system shall connect to broker trading API and verify account information**
+2. WHEN 生成交易信号时 THEN System SHALL 在执行前进行多层风险检查（仓位、止损、日内亏损等）
+   **When generating trading signals, the system shall perform multi-level risk checks before execution (position size, stop loss, daily loss, etc.)**
+3. WHEN 执行交易时 THEN System SHALL 记录所有订单详情并实时更新持仓状态
+   **When executing trades, the system shall log all order details and update position status in real-time**
+4. WHERE 触发风险预警时 THEN System SHALL 暂停交易并通知用户
+   **Where risk alert is triggered, the system shall pause trading and notify user**
+5. WHEN 交易日结束时 THEN System SHALL 生成当日交易总结和持仓报告
+   **When trading day ends, the system shall generate daily trading summary and position report**
+
+### Requirement 21 [NEW]
+
+**User Story (用户故事):** 作为投资者，我希望系统能够定期生成收益报告和风险分析，以便持续监控投资表现。
+**As an investor, I want the system to generate periodic performance reports and risk analysis, so that I can continuously monitor investment performance.**
+
+#### Acceptance Criteria (验收标准)
+
+1. WHEN 交易日结束时 THEN System SHALL 自动生成每日报告（当日收益、持仓、交易记录）
+   **When trading day ends, the system shall automatically generate daily report (daily returns, positions, trade records)**
+2. WHEN 每周结束时 THEN System SHALL 生成周报（周收益、策略表现、风险指标）
+   **When week ends, the system shall generate weekly report (weekly returns, strategy performance, risk metrics)**
+3. WHEN 每月结束时 THEN System SHALL 生成月报（月度收益、年化收益、与目标对比、调整建议）
+   **When month ends, the system shall generate monthly report (monthly returns, annualized returns, target comparison, adjustment suggestions)**
+4. WHERE 检测到异常风险时 THEN System SHALL 立即生成风险预警报告并发送通知
+   **Where abnormal risk is detected, the system shall immediately generate risk alert report and send notification**
+5. WHEN 生成报告时 THEN System SHALL 通过邮件/短信发送给用户
+   **When generating reports, the system shall send to users via email/SMS**
+
+### Requirement 22 [NEW]
+
+**User Story (用户故事):** 作为投资者，我希望系统提供完整的引导式工作流程，从市场选择到实盘交易一站式完成。
+**As an investor, I want the system to provide a complete guided workflow, from market selection to live trading in one seamless process.**
+
+#### Acceptance Criteria (验收标准)
+
+1. WHEN 用户首次使用时 THEN System SHALL 启动引导式工作流程，逐步收集用户配置
+   **When user first uses the system, the system shall start guided workflow to collect user configurations step by step**
+2. WHEN 每个步骤完成时 THEN System SHALL 保存进度并允许用户暂停或返回修改
+   **When each step completes, the system shall save progress and allow user to pause or go back to modify**
+3. WHEN 用户输入无效时 THEN System SHALL 提供实时验证和友好的中文错误提示
+   **When user input is invalid, the system shall provide real-time validation and friendly Chinese error messages**
+4. WHERE 工作流程中断时 THEN System SHALL 保存当前状态，下次启动时可以继续
+   **Where workflow is interrupted, the system shall save current state and allow continuation on next startup**
+5. WHEN 完成所有步骤时 THEN System SHALL 生成完整的配置总结供用户最终确认
+   **When all steps complete, the system shall generate complete configuration summary for user final confirmation**
