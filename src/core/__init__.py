@@ -29,6 +29,8 @@ from .data_manager import (
     DataInfo
 )
 
+from .model_factory import ModelFactory
+
 __all__ = [
     'ConfigManager',
     'Config',
@@ -49,5 +51,6 @@ __all__ = [
     'DataManagerError',
     'MissingValueStrategy',
     'ValidationResult',
-    'DataInfo'
+    'DataInfo',
+    'ModelFactory'
 ]

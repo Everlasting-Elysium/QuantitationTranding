@@ -1,0 +1,272 @@
+# Model Templates Configuration
+# 模型模板配置文件
+#
+# This file defines pre-configured model templates for the qlib trading system.
+# Each template includes default parameters and expected performance metrics.
+# 本文件定义了qlib交易系统的预配置模型模板。
+# 每个模板包含默认参数和预期性能指标。
+
+templates:
+  # LightGBM Template - Best for general purpose quantitative trading
+  # LightGBM模板 - 适用于通用量化交易
+  - name: "lgbm_default"
+    model_type: "lgbm"
+    description: "LightGBM模型，适合大多数量化交易场景"
+    use_case: |
+      适用场景：
+      - 中长期股票预测（持仓周期1-4周）
+      - 需要较高预测准确率
+      - 数据量较大（1000+样本）
+      - 特征维度较高（50+特征）
+      
+      优势：
+      - 训练速度快
+      - 预测准确率高
+      - 对缺失值和异常值鲁棒
+      - 可解释性较好
+      
+      Use Case:
+      - Medium to long-term stock prediction (1-4 weeks holding period)
+      - Requires high prediction accuracy
+      - Large dataset (1000+ samples)
+      - High feature dimensionality (50+ features)
+      
+      Advantages:
+      - Fast training speed
+      - High prediction accuracy
+      - Robust to missing values and outliers
+      - Good interpretability
+    default_params:
+      loss: "mse"
+      num_boost_round: 100
+      early_stopping_rounds: 50
+      learning_rate: 0.1
+      max_depth: 6
+      num_leaves: 31
+      feature_fraction: 0.8
+      bagging_fraction: 0.8
+      bagging_freq: 5
+      min_data_in_leaf: 20
+      lambda_l1: 0.0
+      lambda_l2: 0.0
+      seed: 42
+      verbose: -1
+    expected_performance:
+      ic: 0.08
+      icir: 0.6
+      rank_ic: 0.10
+      annual_return: 0.20
+      sharpe_ratio: 1.5
+      max_drawdown: 0.15
+
+  # Linear Model Template - Best for interpretability and stability
+  # 线性模型模板 - 适合需要可解释性和稳定性的场景
+  - name: "linear_default"
+    model_type: "linear"
+    description: "线性回归模型，简单稳定，可解释性强"
+    use_case: |
+      适用场景：
+      - 需要高度可解释性
+      - 特征之间线性关系明显
+      - 数据量较小（<1000样本）
+      - 追求模型稳定性
+      
+      优势：
+      - 训练速度极快
+      - 可解释性最强
+      - 不易过拟合
+      - 对数据质量要求低
+      
+      Use Case:
+      - Requires high interpretability
+      - Clear linear relationships between features
+      - Small dataset (<1000 samples)
+      - Pursues model stability
+      
+      Advantages:
+      - Extremely fast training
+      - Best interpretability
+      - Less prone to overfitting
+      - Low data quality requirements
+    default_params:
+      estimator: "ridge"
+      alpha: 0.05
+      fit_intercept: true
+      normalize: false
+      max_iter: 1000
+      tol: 0.0001
+      solver: "auto"
+    expected_performance:
+      ic: 0.05
+      icir: 0.4
+      rank_ic: 0.06
+      annual_return: 0.12
+      sharpe_ratio: 1.0
+      max_drawdown: 0.12
+
+  # MLP (Multi-Layer Perceptron) Template - Best for complex patterns
+  # MLP（多层感知机）模板 - 适合捕捉复杂模式
+  - name: "mlp_default"
+    model_type: "mlp"
+    description: "多层神经网络模型，适合捕捉复杂非线性关系"
+    use_case: |
+      适用场景：
+      - 特征之间存在复杂非线性关系
+      - 数据量充足（5000+样本）
+      - 追求最高预测准确率
+      - 有GPU加速条件
+      
+      优势：
+      - 可以学习复杂模式
+      - 预测能力强
+      - 适合高频交易
+      - 可以处理时序依赖
+      
+      注意：
+      - 训练时间较长
+      - 需要较多数据
+      - 容易过拟合
+      - 可解释性较差
+      
+      Use Case:
+      - Complex non-linear relationships between features
+      - Sufficient data (5000+ samples)
+      - Pursues highest prediction accuracy
+      - GPU acceleration available
+      
+      Advantages:
+      - Can learn complex patterns
+      - Strong prediction capability
+      - Suitable for high-frequency trading
+      - Can handle temporal dependencies
+      
+      Notes:
+      - Longer training time
+      - Requires more data
+      - Prone to overfitting
+      - Lower interpretability
+    default_params:
+      lr: 0.001
+      n_epochs: 100
+      batch_size: 2000
+      early_stop: 20
+      optimizer: "adam"
+      loss: "mse"
+      GPU: 0
+      hidden_size: 64
+      num_layers: 2
+      dropout: 0.3
+      activation: "relu"
+      weight_decay: 0.0001
+      seed: 42
+    expected_performance:
+      ic: 0.10
+      icir: 0.8
+      rank_ic: 0.12
+      annual_return: 0.25
+      sharpe_ratio: 1.8
+      max_drawdown: 0.18
+
+  # Conservative LGBM Template - For risk-averse investors
+  # 保守型LGBM模板 - 适合风险厌恶型投资者
+  - name: "lgbm_conservative"
+    model_type: "lgbm"
+    description: "保守型LightGBM模型，降低风险，追求稳定收益"
+    use_case: |
+      适用场景：
+      - 风险厌恶型投资者
+      - 追求稳定收益
+      - 可接受较低收益率
+      - 不能承受大幅回撤
+      
+      特点：
+      - 降低模型复杂度
+      - 减少过拟合风险
+      - 更保守的预测
+      - 更低的换手率
+      
+      Use Case:
+      - Risk-averse investors
+      - Pursues stable returns
+      - Accepts lower returns
+      - Cannot tolerate large drawdowns
+      
+      Features:
+      - Reduced model complexity
+      - Lower overfitting risk
+      - More conservative predictions
+      - Lower turnover rate
+    default_params:
+      loss: "mse"
+      num_boost_round: 50
+      early_stopping_rounds: 30
+      learning_rate: 0.05
+      max_depth: 4
+      num_leaves: 15
+      feature_fraction: 0.7
+      bagging_fraction: 0.7
+      bagging_freq: 5
+      min_data_in_leaf: 50
+      lambda_l1: 0.1
+      lambda_l2: 0.1
+      seed: 42
+      verbose: -1
+    expected_performance:
+      ic: 0.06
+      icir: 0.5
+      rank_ic: 0.08
+      annual_return: 0.15
+      sharpe_ratio: 1.3
+      max_drawdown: 0.10
+
+  # Aggressive LGBM Template - For risk-seeking investors
+  # 进取型LGBM模板 - 适合风险偏好型投资者
+  - name: "lgbm_aggressive"
+    model_type: "lgbm"
+    description: "进取型LightGBM模型，追求高收益，可承受较高风险"
+    use_case: |
+      适用场景：
+      - 风险偏好型投资者
+      - 追求高收益
+      - 可承受较大回撤
+      - 短期交易（持仓1-2周）
+      
+      特点：
+      - 更高的模型复杂度
+      - 更激进的预测
+      - 更高的换手率
+      - 更大的收益波动
+      
+      Use Case:
+      - Risk-seeking investors
+      - Pursues high returns
+      - Can tolerate large drawdowns
+      - Short-term trading (1-2 weeks holding)
+      
+      Features:
+      - Higher model complexity
+      - More aggressive predictions
+      - Higher turnover rate
+      - Larger return volatility
+    default_params:
+      loss: "mse"
+      num_boost_round: 150
+      early_stopping_rounds: 50
+      learning_rate: 0.15
+      max_depth: 8
+      num_leaves: 63
+      feature_fraction: 0.9
+      bagging_fraction: 0.9
+      bagging_freq: 3
+      min_data_in_leaf: 10
+      lambda_l1: 0.0
+      lambda_l2: 0.0
+      seed: 42
+      verbose: -1
+    expected_performance:
+      ic: 0.10
+      icir: 0.7
+      rank_ic: 0.12
+      annual_return: 0.30
+      sharpe_ratio: 1.6
+      max_drawdown: 0.22

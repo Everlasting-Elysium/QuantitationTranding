@@ -108,7 +108,7 @@
 - [x] 7. Checkpoint - 确保所有基础设施测试通过
   - 确保所有测试通过，如有问题请询问用户
 
-- [ ] 8. 实现模型模板系统
+- [x] 8. 实现模型模板系统
   - 创建ModelTemplate数据类
   - 定义至少三种预配置模型模板（LGBM、Linear、MLP）
   - 在YAML文件中配置模板参数
@@ -122,7 +122,7 @@
   - **Property 44: Templates use default parameters**
   - **Validates: Requirements 14.3**
 
-- [ ] 9. 实现模型工厂
+- [x] 9. 实现模型工厂
   - 创建ModelFactory类
   - 实现各种模型类型的创建逻辑
   - 实现模板加载功能
