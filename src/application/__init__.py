@@ -11,10 +11,21 @@ from .training_manager import (
     TrainingManagerError
 )
 
+from .model_registry import (
+    ModelRegistry,
+    ModelInfo,
+    ModelFilter,
+    ModelRegistryError
+)
+
 __all__ = [
     "TrainingManager",
     "TrainingConfig",
     "DatasetConfig",
     "TrainingResult",
     "TrainingManagerError",
+    "ModelRegistry",
+    "ModelInfo",
+    "ModelFilter",
+    "ModelRegistryError",
 ]

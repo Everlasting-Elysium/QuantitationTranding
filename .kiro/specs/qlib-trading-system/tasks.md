@@ -165,7 +165,7 @@
   - **Property 11: Final metrics recorded after training**
   - **Validates: Requirements 3.4**
 
-- [ ] 11. 实现模型注册表
+- [x] 11. 实现模型注册表
   - 创建ModelRegistry类
   - 实现模型注册和版本管理
   - 实现模型查询和加载功能
