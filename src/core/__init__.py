@@ -23,7 +23,6 @@ from .config_manager import (
 
 from .data_manager import (
     DataManager,
-    DataManagerError,
     MissingValueStrategy,
     ValidationResult,
     DataInfo
@@ -48,7 +47,6 @@ __all__ = [
     'VisualizationConfig',
     'CLIConfig',
     'DataManager',
-    'DataManagerError',
     'MissingValueStrategy',
     'ValidationResult',
     'DataInfo',

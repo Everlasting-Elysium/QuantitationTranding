@@ -75,15 +75,18 @@ class TestQlibWrapper:
     
     def test_init_nonexistent_path(self):
         """测试初始化不存在的数据路径"""
+        from src.utils.error_handler import DataError
+        
         wrapper = QlibWrapper()
         
-        with pytest.raises(QlibInitializationError) as exc_info:
+        # 现在抛出DataError而不是QlibInitializationError
+        with pytest.raises(DataError) as exc_info:
             wrapper.init(
                 provider_uri="/nonexistent/path",
                 region="cn"
             )
         
-        assert "数据路径不存在" in str(exc_info.value)
+        assert "数据路径不存在" in str(exc_info.value) or "DAT0008" in str(exc_info.value)
     
     @patch('src.infrastructure.qlib_wrapper.qlib')
     def test_init_qlib_exception(self, mock_qlib, tmp_path):

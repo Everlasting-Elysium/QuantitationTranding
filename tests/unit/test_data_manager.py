@@ -8,12 +8,12 @@ from datetime import datetime
 
 from src.core.data_manager import (
     DataManager,
-    DataManagerError,
     MissingValueStrategy,
     ValidationResult,
     DataInfo
 )
 from src.infrastructure.qlib_wrapper import QlibWrapper, QlibDataError
+from src.utils.error_handler import DataError
 
 
 class TestDataManager:
@@ -53,11 +53,11 @@ class TestDataManager:
         
         manager = DataManager(qlib_wrapper=mock_wrapper)
         
-        # Should raise DataManagerError
-        with pytest.raises(DataManagerError) as exc_info:
+        # Should raise DataError
+        with pytest.raises(DataError) as exc_info:
             manager.initialize(data_path="/nonexistent", region="cn")
         
-        assert "数据管理器初始化失败" in str(exc_info.value)
+        assert "初始化失败" in str(exc_info.value) or "failed" in str(exc_info.value).lower()
         assert not manager.is_initialized()
     
     def test_validate_data_not_initialized(self):
@@ -229,10 +229,10 @@ class TestDataManager:
         """Test getting data info when not initialized"""
         manager = DataManager()
         
-        with pytest.raises(DataManagerError) as exc_info:
+        with pytest.raises(DataError) as exc_info:
             manager.get_data_info()
         
-        assert "未初始化" in str(exc_info.value)
+        assert "未初始化" in str(exc_info.value) or "not initialized" in str(exc_info.value).lower()
     
     def test_get_data_info_success(self):
         """Test successful data info retrieval"""

@@ -76,22 +76,64 @@
 
 - Python 3.8+
 - 16GB+ 内存
-- 5GB+ 磁盘空间
+- 5GB+ 磁盘空间（用于数据存储）
 
-### 安装步骤
+### 一键初始化（推荐）
+
+我们提供了一键初始化脚本，自动完成所有设置：
+
+#### Linux/Mac用户：
+```bash
+# 进入项目目录
+cd Code/QuantitationTranding
+
+# 运行快速启动脚本（自动完成所有初始化）
+chmod +x quick_start.sh
+./quick_start.sh
+```
+
+#### Windows用户：
+```cmd
+# 进入项目目录
+cd Code\QuantitationTranding
+
+# 运行快速启动脚本（自动完成所有初始化）
+quick_start.bat
+```
+
+#### 或者使用Python脚本：
+```bash
+# 适用于所有平台
+python init_system.py
+```
+
+### 一键初始化做了什么？
+
+初始化脚本会自动完成以下步骤：
+
+1. ✅ **检查Python版本** - 确保Python 3.8+
+2. ✅ **检查依赖包** - 自动检测缺失的依赖
+3. ✅ **安装依赖** - 询问后自动安装缺失的包
+4. ✅ **创建目录** - 创建必要的数据和日志目录
+5. ✅ **下载数据** - 自动下载中国A股示例数据（约2-5分钟）
+6. ✅ **验证系统** - 运行示例验证系统配置
+
+### 手动安装步骤（可选）
+
+如果你想手动控制每个步骤：
 
 ```bash
-# 1. 克隆项目
+# 1. 进入项目目录
 cd Code/QuantitationTranding
 
 # 2. 安装依赖
 pip install -r requirements.txt
 
-# 3. 一键初始化（自动下载数据和配置环境）
-python -m src.cli.main init
+# 3. 下载数据
+python -m qlib.run.get_data qlib_data --target_dir ~/.qlib/qlib_data/cn_data --region cn
 
 # 4. 启动系统
-python -m src.cli.main
+python main.py
 ```
 
 ### 第一次使用
@@ -115,10 +157,10 @@ python -m src.cli.main
 
 ## 📖 详细文档
 
-- [快速开始指南](docs/quick_start.md) - 5分钟上手教程
-- [用户手册](docs/user_guide.md) - 完整功能说明
-- [API参考](docs/api_reference.md) - 开发者文档
-- [术语表](docs/glossary.md) - 量化交易术语解释
+- [快速开始指南](docs/quick_start.md) - 5分钟上手教程，从安装到第一次训练
+- [用户手册](docs/user_guide.md) - 完整功能说明，涵盖所有操作
+- [API参考](docs/api_reference.md) - 开发者文档，适合二次开发
+- [初始化指南](docs/initialization.md) - 系统初始化详细说明
 
 ## 🎓 示例教程
 

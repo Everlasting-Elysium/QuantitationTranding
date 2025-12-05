@@ -9,6 +9,15 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field, asdict
 
+from ..utils.error_handler import (
+    ConfigurationError,
+    ErrorInfo,
+    ErrorCategory,
+    ErrorSeverity,
+    error_handler_decorator,
+    get_error_handler
+)
+
 
 @dataclass
 class QlibConfig:
@@ -148,41 +157,91 @@ class ConfigManager:
     
     def load_config(self, config_path: str) -> Config:
         """
-        从YAML文件加载配置
+        从YAML文件加载配置 / Load configuration from YAML file
         
         Args:
-            config_path: 配置文件路径
+            config_path: 配置文件路径 / Configuration file path
             
         Returns:
-            Config: 配置对象
+            Config: 配置对象 / Configuration object
             
         Raises:
-            FileNotFoundError: 配置文件不存在
-            yaml.YAMLError: YAML格式错误
-            ValueError: 配置验证失败
+            ConfigurationError: 配置加载失败时抛出 / Raised when configuration loading fails
         """
-        config_path = Path(config_path).expanduser()
-        
-        if not config_path.exists():
-            raise FileNotFoundError(f"配置文件不存在: {config_path}")
-        
         try:
-            with open(config_path, 'r', encoding='utf-8') as f:
-                config_dict = yaml.safe_load(f)
-        except yaml.YAMLError as e:
-            raise yaml.YAMLError(f"配置文件格式错误: {e}")
-        
-        # 解析配置
-        config = self._parse_config(config_dict)
-        
-        # 验证配置
-        errors = self.validate_config(config)
-        if errors:
-            error_msg = "\n".join(errors)
-            raise ValueError(f"配置验证失败:\n{error_msg}")
-        
-        self._config = config
-        return config
+            config_path = Path(config_path).expanduser()
+            
+            if not config_path.exists():
+                error_info = ErrorInfo(
+                    error_code="CFG0001",
+                    error_message_zh=f"配置文件不存在: {config_path}",
+                    error_message_en=f"Configuration file not found: {config_path}",
+                    category=ErrorCategory.CONFIGURATION,
+                    severity=ErrorSeverity.HIGH,
+                    technical_details=f"File path: {config_path}",
+                    suggested_actions=[
+                        "检查配置文件路径是否正确",
+                        "使用 get_default_config() 创建默认配置",
+                        "确认配置文件是否已被删除或移动"
+                    ],
+                    recoverable=True
+                )
+                raise ConfigurationError(error_info)
+            
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config_dict = yaml.safe_load(f)
+            except yaml.YAMLError as e:
+                error_info = ErrorInfo(
+                    error_code="CFG0002",
+                    error_message_zh=f"配置文件格式错误: {str(e)}",
+                    error_message_en=f"Configuration file format error: {str(e)}",
+                    category=ErrorCategory.CONFIGURATION,
+                    severity=ErrorSeverity.HIGH,
+                    technical_details=f"YAML parsing error: {str(e)}",
+                    suggested_actions=[
+                        "检查YAML文件格式是否正确",
+                        "确认缩进是否使用空格而非制表符",
+                        "使用YAML验证工具检查文件",
+                        "参考示例配置文件"
+                    ],
+                    recoverable=False,
+                    original_exception=e
+                )
+                raise ConfigurationError(error_info)
+            
+            # 解析配置
+            config = self._parse_config(config_dict)
+            
+            # 验证配置
+            errors = self.validate_config(config)
+            if errors:
+                error_msg = "\n".join(errors)
+                error_info = ErrorInfo(
+                    error_code="CFG0003",
+                    error_message_zh=f"配置验证失败:\n{error_msg}",
+                    error_message_en=f"Configuration validation failed:\n{error_msg}",
+                    category=ErrorCategory.CONFIGURATION,
+                    severity=ErrorSeverity.HIGH,
+                    technical_details=error_msg,
+                    suggested_actions=[
+                        "检查配置文件中的所有必需字段",
+                        "验证配置值的类型和范围",
+                        "参考文档了解正确的配置格式",
+                        "使用 validate_config() 方法检查具体错误"
+                    ],
+                    recoverable=True
+                )
+                raise ConfigurationError(error_info)
+            
+            self._config = config
+            return config
+            
+        except ConfigurationError:
+            raise
+        except Exception as e:
+            error_handler = get_error_handler()
+            error_handler.handle_error(e, {"config_path": str(config_path)})
     
     def save_config(self, config: Config, config_path: str) -> None:
         """

@@ -321,51 +321,61 @@ class TrainingManager:
             TrainingManagerError: 加载失败时抛出 / Raised when loading fails
         """
         try:
-            # 导入qlib的数据集类 / Import qlib dataset classes
-            from qlib.data.dataset import DatasetH
-            from qlib.data.dataset.handler import DataHandlerLP
-            
-            # 构建数据处理器配置 / Build data handler configuration
-            handler_config = {
-                "start_time": config.start_time,
-                "end_time": config.end_time,
-                "fit_start_time": config.start_time,
-                "fit_end_time": config.end_time,
-                "instruments": config.instruments,
-            }
-            
-            # 构建特征和标签配置 / Build features and label configuration
-            # qlib使用特殊的表达式语法 / qlib uses special expression syntax
-            # 这里假设features已经是qlib表达式格式 / Assume features are in qlib expression format
-            segments = {
-                "train": (config.start_time, config.end_time),
-            }
-            
-            # 创建数据处理器 / Create data handler
-            handler = DataHandlerLP(
-                instruments=config.instruments,
-                start_time=config.start_time,
-                end_time=config.end_time,
-                infer_processors=[],
-                learn_processors=[],
-                fit_start_time=config.start_time,
-                fit_end_time=config.end_time,
-            )
-            
-            # 创建数据集 / Create dataset
-            dataset = DatasetH(
-                handler=handler,
-                segments=segments,
-            )
+            # 简化实现：直接使用qlib的D模块获取数据
+            # 这样可以避免复杂的DataHandlerLP配置问题
+            from qlib.data import D
+            import pandas as pd
             
             self._logger.info(
-                f"数据集加载成功 / Dataset loaded successfully\n"
+                f"使用简化的数据加载方式 / Using simplified data loading\n"
                 f"时间范围 / Time range: {config.start_time} 至 / to {config.end_time}\n"
                 f"股票池 / Instruments: {config.instruments}"
             )
             
-            return {"dataset": dataset, "config": config}
+            # 使用D.features直接获取数据
+            # 这是qlib 0.9.7推荐的简单方式
+            data = D.features(
+                instruments=config.instruments,
+                fields=config.features,
+                start_time=config.start_time,
+                end_time=config.end_time,
+                freq="day"
+            )
             
+            if data is None or data.empty:
+                raise TrainingManagerError(
+                    f"未获取到数据 / No data retrieved for instruments: {config.instruments}"
+                )
+            
+            # 添加标签列
+            if config.label:
+                label_data = D.features(
+                    instruments=config.instruments,
+                    fields=[config.label],
+                    start_time=config.start_time,
+                    end_time=config.end_time,
+                    freq="day"
+                )
+                if label_data is not None and not label_data.empty:
+                    data = pd.concat([data, label_data], axis=1)
+            
+            self._logger.info(
+                f"数据集加载成功 / Dataset loaded successfully\n"
+                f"数据形状 / Data shape: {data.shape}\n"
+                f"特征列 / Feature columns: {list(data.columns)}"
+            )
+            
+            # 返回简化的数据集格式
+            # 包含原始DataFrame和配置信息
+            return {
+                "data": data,
+                "config": config,
+                "features": config.features,
+                "label": config.label
+            }
+            
+        except TrainingManagerError:
+            raise
         except Exception as e:
             error_msg = f"加载数据集失败 / Failed to load dataset: {str(e)}"
             self._logger.error(error_msg, exc_info=True)
@@ -382,7 +392,7 @@ class TrainingManager:
         
         Args:
             model: 模型实例 / Model instance
-            dataset: 数据集 / Dataset
+            dataset: 数据集字典，包含data, features, label / Dataset dict with data, features, label
             training_params: 训练参数 / Training parameters
             
         Returns:
@@ -392,17 +402,40 @@ class TrainingManager:
             TrainingManagerError: 训练失败时抛出 / Raised when training fails
         """
         try:
-            # 获取qlib数据集 / Get qlib dataset
-            qlib_dataset = dataset["dataset"]
+            # 获取数据 / Get data
+            data = dataset["data"]
+            features = dataset["features"]
+            label = dataset["label"]
+            
+            # 准备训练数据 / Prepare training data
+            # 分离特征和标签
+            X = data[features]
+            y = data[label] if label else None
+            
+            self._logger.info(
+                f"准备训练数据 / Preparing training data\n"
+                f"特征形状 / Features shape: {X.shape}\n"
+                f"标签形状 / Label shape: {y.shape if y is not None else 'None'}"
+            )
             
             # 训练模型 / Train model
-            # qlib模型通常有fit方法 / qlib models typically have a fit method
-            model.fit(qlib_dataset)
+            # 对于sklearn类型的模型，使用fit(X, y)
+            if hasattr(model, 'fit'):
+                if y is not None:
+                    model.fit(X, y)
+                else:
+                    model.fit(X)
+            else:
+                raise TrainingManagerError(
+                    f"模型没有fit方法 / Model does not have fit method: {type(model)}"
+                )
             
             self._logger.info("模型训练完成 / Model training completed")
             
             return model
             
+        except TrainingManagerError:
+            raise
         except Exception as e:
             error_msg = f"模型训练失败 / Model training failed: {str(e)}"
             self._logger.error(error_msg, exc_info=True)

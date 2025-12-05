@@ -62,13 +62,19 @@ class TestConfigManager:
     
     def test_load_nonexistent_config(self):
         """测试加载不存在的配置文件"""
+        from src.utils.error_handler import ConfigurationError
+        
         manager = ConfigManager()
         
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(ConfigurationError) as exc_info:
             manager.load_config("/nonexistent/path/config.yaml")
+        
+        assert "CFG0001" in str(exc_info.value) or "不存在" in str(exc_info.value)
     
     def test_load_invalid_yaml(self, tmp_path):
         """测试加载无效的YAML文件"""
+        from src.utils.error_handler import ConfigurationError
+        
         manager = ConfigManager()
         
         # 创建无效的YAML文件
@@ -76,8 +82,10 @@ class TestConfigManager:
         with open(config_path, 'w') as f:
             f.write("invalid: yaml: content: [")
         
-        with pytest.raises(yaml.YAMLError):
+        with pytest.raises(ConfigurationError) as exc_info:
             manager.load_config(str(config_path))
+        
+        assert "CFG0002" in str(exc_info.value) or "格式错误" in str(exc_info.value)
     
     def test_validate_config_success(self, tmp_path):
         """测试配置验证成功"""

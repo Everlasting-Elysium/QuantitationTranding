@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from infrastructure.logger_system import LoggerSystem, get_logger, setup_logging
+from src.infrastructure.logger_system import LoggerSystem, get_logger, setup_logging
 
 
 class TestLoggerSystem:

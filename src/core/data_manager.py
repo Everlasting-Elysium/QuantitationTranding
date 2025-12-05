@@ -1,6 +1,7 @@
 """
-数据管理器模块
+数据管理器模块 / Data Manager Module
 负责数据下载、验证、完整性检查和缺失值处理
+Responsible for data download, validation, integrity check, and missing value handling
 """
 
 import pandas as pd
@@ -12,6 +13,15 @@ from enum import Enum
 
 from ..infrastructure.logger_system import get_logger
 from ..infrastructure.qlib_wrapper import QlibWrapper, QlibDataError
+from ..utils.error_handler import (
+    DataError,
+    ErrorInfo,
+    ErrorCategory,
+    ErrorSeverity,
+    error_handler_decorator,
+    get_error_handler
+)
+from ..utils.cache_manager import get_cache_manager
 
 
 class MissingValueStrategy(Enum):
@@ -50,9 +60,8 @@ class DataInfo:
     last_updated: Optional[str] = None
 
 
-class DataManagerError(Exception):
-    """数据管理器错误"""
-    pass
+# 移除旧的异常类，使用新的错误处理系统
+# Removed old exception class, using new error handling system
 
 
 class DataManager:
@@ -66,16 +75,19 @@ class DataManager:
     - 处理缺失值
     """
     
-    def __init__(self, qlib_wrapper: Optional[QlibWrapper] = None):
+    def __init__(self, qlib_wrapper: Optional[QlibWrapper] = None, enable_cache: bool = True):
         """
         初始化数据管理器
         
         Args:
             qlib_wrapper: QlibWrapper实例，如果为None则创建新实例
+            enable_cache: 是否启用缓存 / Whether to enable cache
         """
         self._qlib_wrapper = qlib_wrapper or QlibWrapper()
         self._logger = get_logger(__name__)
         self._initialized = False
+        self._enable_cache = enable_cache
+        self._cache_manager = get_cache_manager() if enable_cache else None
     
     def initialize(
         self,
@@ -84,15 +96,15 @@ class DataManager:
         auto_mount: bool = True
     ) -> None:
         """
-        初始化qlib数据环境
+        初始化qlib数据环境 / Initialize qlib data environment
         
         Args:
-            data_path: 数据路径
-            region: 市场区域，默认为"cn"
-            auto_mount: 是否自动挂载数据
+            data_path: 数据路径 / Data path
+            region: 市场区域，默认为"cn" / Market region, default is "cn"
+            auto_mount: 是否自动挂载数据 / Whether to auto-mount data
             
         Raises:
-            DataManagerError: 初始化失败时抛出
+            DataError: 初始化失败时抛出 / Raised when initialization fails
         """
         try:
             self._logger.info(f"初始化数据管理器 - 数据路径: {data_path}, 区域: {region}")
@@ -108,9 +120,24 @@ class DataManager:
             self._logger.info("数据管理器初始化成功")
             
         except Exception as e:
-            error_msg = f"数据管理器初始化失败: {str(e)}"
-            self._logger.error(error_msg, exc_info=True)
-            raise DataManagerError(error_msg) from e
+            error_info = ErrorInfo(
+                error_code="DAT0001",
+                error_message_zh=f"数据管理器初始化失败: {str(e)}",
+                error_message_en=f"Data manager initialization failed: {str(e)}",
+                category=ErrorCategory.DATA,
+                severity=ErrorSeverity.CRITICAL,
+                technical_details=str(e),
+                suggested_actions=[
+                    "检查数据路径是否存在且可访问",
+                    "确认qlib是否正确安装",
+                    "验证数据文件是否完整",
+                    "尝试重新下载数据"
+                ],
+                recoverable=True,
+                original_exception=e
+            )
+            self._logger.error(error_info.get_user_message(), exc_info=True)
+            raise DataError(error_info)
     
     def download_data(
         self,
@@ -121,17 +148,17 @@ class DataManager:
         end_date: Optional[str] = None
     ) -> None:
         """
-        下载市场数据
+        下载市场数据 / Download market data
         
         Args:
-            region: 市场区域 (cn, us等)
-            target_dir: 目标目录
-            interval: 数据间隔，默认为"1d"（日线）
-            start_date: 开始日期（可选）
-            end_date: 结束日期（可选）
+            region: 市场区域 (cn, us等) / Market region (cn, us, etc.)
+            target_dir: 目标目录 / Target directory
+            interval: 数据间隔，默认为"1d"（日线） / Data interval, default is "1d" (daily)
+            start_date: 开始日期（可选） / Start date (optional)
+            end_date: 结束日期（可选） / End date (optional)
             
         Raises:
-            DataManagerError: 下载失败时抛出
+            DataError: 下载失败时抛出 / Raised when download fails
         """
         try:
             self._logger.info(
@@ -166,12 +193,44 @@ class DataManager:
                 )
                 
             except ImportError as e:
-                raise DataManagerError(f"qlib未正确安装: {str(e)}")
+                error_info = ErrorInfo(
+                    error_code="DAT0002",
+                    error_message_zh=f"qlib未正确安装: {str(e)}",
+                    error_message_en=f"qlib not properly installed: {str(e)}",
+                    category=ErrorCategory.DATA,
+                    severity=ErrorSeverity.CRITICAL,
+                    technical_details=str(e),
+                    suggested_actions=[
+                        "安装qlib: pip install qlib",
+                        "检查Python环境是否正确",
+                        "确认qlib版本是否兼容"
+                    ],
+                    recoverable=False,
+                    original_exception=e
+                )
+                raise DataError(error_info)
             
+        except DataError:
+            raise
         except Exception as e:
-            error_msg = f"数据下载失败: {str(e)}"
-            self._logger.error(error_msg, exc_info=True)
-            raise DataManagerError(error_msg) from e
+            error_info = ErrorInfo(
+                error_code="DAT0003",
+                error_message_zh=f"数据下载失败: {str(e)}",
+                error_message_en=f"Data download failed: {str(e)}",
+                category=ErrorCategory.DATA,
+                severity=ErrorSeverity.HIGH,
+                technical_details=str(e),
+                suggested_actions=[
+                    "检查网络连接是否正常",
+                    "确认目标目录是否有写入权限",
+                    "验证区域参数是否正确",
+                    "稍后重试"
+                ],
+                recoverable=True,
+                original_exception=e
+            )
+            self._logger.error(error_info.get_user_message(), exc_info=True)
+            raise DataError(error_info)
     
     def validate_data(
         self,
@@ -196,6 +255,14 @@ class DataManager:
                 message="数据管理器未初始化",
                 issues=["数据管理器未初始化，请先调用initialize()方法"]
             )
+        
+        # 尝试从缓存获取验证结果
+        if self._enable_cache and self._cache_manager:
+            cache_key = f"validate_{instruments}_{start_date}_{end_date}"
+            cached_result = self._cache_manager.get(cache_key)
+            if cached_result is not None:
+                self._logger.debug(f"使用缓存的验证结果: {cache_key}")
+                return cached_result
         
         try:
             self._logger.info(
@@ -285,6 +352,12 @@ class DataManager:
                 )
             
             self._logger.info(result.message)
+            
+            # 缓存验证结果（TTL: 1小时）
+            if self._enable_cache and self._cache_manager:
+                cache_key = f"validate_{instruments}_{start_date}_{end_date}"
+                self._cache_manager.set(cache_key, result, ttl=3600)
+            
             return result
             
         except Exception as e:
@@ -303,18 +376,18 @@ class DataManager:
         fill_value: Optional[float] = None
     ) -> pd.DataFrame:
         """
-        处理数据中的缺失值
+        处理数据中的缺失值 / Handle missing values in data
         
         Args:
-            data: 包含缺失值的数据
-            strategy: 缺失值处理策略
-            fill_value: 填充值（当strategy为ZERO时使用）
+            data: 包含缺失值的数据 / Data containing missing values
+            strategy: 缺失值处理策略 / Missing value handling strategy
+            fill_value: 填充值（当strategy为ZERO时使用） / Fill value (used when strategy is ZERO)
             
         Returns:
-            pd.DataFrame: 处理后的数据
+            pd.DataFrame: 处理后的数据 / Processed data
             
         Raises:
-            DataManagerError: 处理失败时抛出
+            DataError: 处理失败时抛出 / Raised when processing fails
         """
         try:
             self._logger.info(f"处理缺失值 - 策略: {strategy.value}")
@@ -343,7 +416,20 @@ class DataManager:
             elif strategy == MissingValueStrategy.DROP:
                 result = data.dropna()
             else:
-                raise DataManagerError(f"不支持的缺失值处理策略: {strategy}")
+                error_info = ErrorInfo(
+                    error_code="DAT0004",
+                    error_message_zh=f"不支持的缺失值处理策略: {strategy}",
+                    error_message_en=f"Unsupported missing value strategy: {strategy}",
+                    category=ErrorCategory.DATA,
+                    severity=ErrorSeverity.MEDIUM,
+                    technical_details=f"Strategy: {strategy}",
+                    suggested_actions=[
+                        "使用支持的策略: FORWARD_FILL, BACKWARD_FILL, MEAN, ZERO, DROP",
+                        "检查策略参数是否正确"
+                    ],
+                    recoverable=False
+                )
+                raise DataError(error_info)
             
             # 记录处理后的缺失值数量
             missing_count_after = result.isnull().sum().sum()
@@ -354,23 +440,52 @@ class DataManager:
             
             return result
             
+        except DataError:
+            raise
         except Exception as e:
-            error_msg = f"缺失值处理失败: {str(e)}"
-            self._logger.error(error_msg, exc_info=True)
-            raise DataManagerError(error_msg) from e
+            error_info = ErrorInfo(
+                error_code="DAT0005",
+                error_message_zh=f"缺失值处理失败: {str(e)}",
+                error_message_en=f"Missing value handling failed: {str(e)}",
+                category=ErrorCategory.DATA,
+                severity=ErrorSeverity.MEDIUM,
+                technical_details=str(e),
+                suggested_actions=[
+                    "检查数据格式是否正确",
+                    "验证数据类型是否支持所选策略",
+                    "尝试使用其他处理策略"
+                ],
+                recoverable=True,
+                original_exception=e
+            )
+            self._logger.error(error_info.get_user_message(), exc_info=True)
+            raise DataError(error_info)
     
     def get_data_info(self) -> DataInfo:
         """
-        获取数据信息
+        获取数据信息 / Get data information
         
         Returns:
-            DataInfo: 数据信息对象
+            DataInfo: 数据信息对象 / Data information object
             
         Raises:
-            DataManagerError: 获取失败时抛出
+            DataError: 获取失败时抛出 / Raised when retrieval fails
         """
         if not self._initialized:
-            raise DataManagerError("数据管理器未初始化，请先调用initialize()方法")
+            error_info = ErrorInfo(
+                error_code="DAT0006",
+                error_message_zh="数据管理器未初始化，请先调用initialize()方法",
+                error_message_en="Data manager not initialized, please call initialize() first",
+                category=ErrorCategory.DATA,
+                severity=ErrorSeverity.HIGH,
+                technical_details="DataManager.initialize() not called",
+                suggested_actions=[
+                    "调用 initialize() 方法初始化数据管理器",
+                    "检查初始化流程是否正确执行"
+                ],
+                recoverable=True
+            )
+            raise DataError(error_info)
         
         try:
             # 从qlib_wrapper获取数据信息
@@ -402,10 +517,26 @@ class DataManager:
             
             return data_info
             
+        except DataError:
+            raise
         except Exception as e:
-            error_msg = f"获取数据信息失败: {str(e)}"
-            self._logger.error(error_msg, exc_info=True)
-            raise DataManagerError(error_msg) from e
+            error_info = ErrorInfo(
+                error_code="DAT0007",
+                error_message_zh=f"获取数据信息失败: {str(e)}",
+                error_message_en=f"Failed to get data information: {str(e)}",
+                category=ErrorCategory.DATA,
+                severity=ErrorSeverity.MEDIUM,
+                technical_details=str(e),
+                suggested_actions=[
+                    "检查数据是否正确初始化",
+                    "验证数据文件是否完整",
+                    "尝试重新初始化数据管理器"
+                ],
+                recoverable=True,
+                original_exception=e
+            )
+            self._logger.error(error_info.get_user_message(), exc_info=True)
+            raise DataError(error_info)
     
     def check_data_coverage(
         self,
