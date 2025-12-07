@@ -14,6 +14,8 @@ from ..core.data_manager import DataManager
 from ..core.model_factory import ModelFactory
 from ..infrastructure.mlflow_tracker import MLflowTracker
 from ..infrastructure.logger_system import get_logger
+from ..application.strategy_optimizer import StrategyOptimizer
+from ..models.market_models import OptimizationConstraints
 
 
 @dataclass
@@ -100,6 +102,7 @@ class TrainingManager:
         data_manager: DataManager,
         model_factory: ModelFactory,
         mlflow_tracker: Optional[MLflowTracker] = None,
+        strategy_optimizer: Optional[StrategyOptimizer] = None,
         output_dir: str = "./outputs"
     ):
         """
@@ -109,11 +112,13 @@ class TrainingManager:
             data_manager: 数据管理器实例 / Data manager instance
             model_factory: 模型工厂实例 / Model factory instance
             mlflow_tracker: MLflow追踪器实例（可选）/ MLflow tracker instance (optional)
+            strategy_optimizer: 策略优化器实例（可选）/ Strategy optimizer instance (optional)
             output_dir: 输出目录 / Output directory
         """
         self._data_manager = data_manager
         self._model_factory = model_factory
         self._mlflow_tracker = mlflow_tracker
+        self._strategy_optimizer = strategy_optimizer or StrategyOptimizer()
         self._output_dir = Path(output_dir).expanduser()
         self._logger = get_logger(__name__)
         
@@ -298,6 +303,180 @@ class TrainingManager:
             self._logger.error(error_msg, exc_info=True)
             raise TrainingManagerError(error_msg) from e
     
+    def train_for_target_return(
+        self,
+        target_return: float,
+        assets: List[str],
+        dataset_config: DatasetConfig,
+        experiment_name: str,
+        risk_tolerance: str = "moderate",
+        custom_constraints: Optional[OptimizationConstraints] = None
+    ) -> TrainingResult:
+        """
+        根据目标收益率训练模型 / Train Model for Target Return
+        
+        使用策略优化器根据目标收益率优化策略参数，然后训练模型
+        Uses strategy optimizer to optimize strategy parameters based on target return, then trains model
+        
+        Args:
+            target_return: 目标年化收益率（例如0.20表示20%）/ Target annual return (e.g., 0.20 for 20%)
+            assets: 资产列表 / Asset list
+            dataset_config: 数据集配置 / Dataset configuration
+            experiment_name: 实验名称 / Experiment name
+            risk_tolerance: 风险偏好（conservative/moderate/aggressive）/ Risk tolerance
+            custom_constraints: 自定义约束条件（可选）/ Custom constraints (optional)
+            
+        Returns:
+            TrainingResult: 训练结果 / Training result
+            
+        Raises:
+            TrainingManagerError: 训练失败时抛出 / Raised when training fails
+        """
+        try:
+            self._logger.info(
+                f"开始目标导向训练 / Starting target-oriented training\n"
+                f"目标收益率 / Target return: {target_return:.2%}\n"
+                f"资产数量 / Asset count: {len(assets)}\n"
+                f"风险偏好 / Risk tolerance: {risk_tolerance}"
+            )
+            
+            # 1. 使用策略优化器建议参数 / Use strategy optimizer to suggest parameters
+            self._logger.info("使用策略优化器建议参数 / Using strategy optimizer to suggest parameters...")
+            suggested_params = self._strategy_optimizer.suggest_parameters(
+                target_return=target_return,
+                risk_tolerance=risk_tolerance
+            )
+            
+            # 记录建议的参数 / Log suggested parameters
+            self._logger.info(
+                f"策略优化器建议 / Strategy optimizer suggestions:\n"
+                f"模型类型 / Model type: {suggested_params.model_type}\n"
+                f"特征数量 / Feature count: {len(suggested_params.features)}\n"
+                f"回溯期 / Lookback period: {suggested_params.lookback_period}天 / days\n"
+                f"再平衡频率 / Rebalance frequency: {suggested_params.rebalance_frequency}"
+            )
+            
+            # 2. 如果提供了约束条件，进行完整的策略优化 / If constraints provided, perform full strategy optimization
+            optimized_strategy = None
+            if custom_constraints:
+                self._logger.info("执行完整策略优化 / Performing full strategy optimization...")
+                optimized_strategy = self._strategy_optimizer.optimize_for_target_return(
+                    target_return=target_return,
+                    assets=assets,
+                    constraints=custom_constraints
+                )
+                
+                self._logger.info(
+                    f"策略优化完成 / Strategy optimization completed\n"
+                    f"预期收益率 / Expected return: {optimized_strategy.expected_return:.2%}\n"
+                    f"预期风险 / Expected risk: {optimized_strategy.expected_risk:.2%}\n"
+                    f"优化评分 / Optimization score: {optimized_strategy.optimization_score:.2f}\n"
+                    f"可行性 / Feasible: {optimized_strategy.feasible}"
+                )
+                
+                # 如果策略不可行，记录警告 / If strategy not feasible, log warnings
+                if not optimized_strategy.feasible:
+                    self._logger.warning(
+                        f"优化策略可能不可行 / Optimized strategy may not be feasible\n"
+                        f"警告 / Warnings: {optimized_strategy.warnings}"
+                    )
+            
+            # 3. 构建训练配置 / Build training configuration
+            # 使用建议的参数构建模型参数 / Build model params using suggested parameters
+            model_params = {
+                "n_estimators": 100,
+                "learning_rate": 0.05,
+                "max_depth": 6,
+                "num_leaves": 31,
+            }
+            
+            # 根据风险偏好调整参数 / Adjust parameters based on risk tolerance
+            if risk_tolerance == "conservative":
+                model_params["learning_rate"] = 0.03
+                model_params["max_depth"] = 4
+            elif risk_tolerance == "aggressive":
+                model_params["learning_rate"] = 0.1
+                model_params["max_depth"] = 8
+            
+            # 更新数据集配置的特征 / Update dataset config features
+            updated_dataset_config = DatasetConfig(
+                instruments=dataset_config.instruments,
+                start_time=dataset_config.start_time,
+                end_time=dataset_config.end_time,
+                features=suggested_params.features,
+                label=dataset_config.label
+            )
+            
+            # 构建训练配置 / Build training configuration
+            training_config = TrainingConfig(
+                model_type=suggested_params.model_type,
+                dataset_config=updated_dataset_config,
+                model_params=model_params,
+                training_params={
+                    "lookback_period": suggested_params.lookback_period,
+                    "rebalance_frequency": suggested_params.rebalance_frequency,
+                },
+                experiment_name=experiment_name,
+                target_return=target_return,
+                optimization_objective="sharpe_ratio"
+            )
+            
+            # 4. 训练模型 / Train model
+            self._logger.info("开始训练模型 / Starting model training...")
+            result = self.train_model(training_config)
+            
+            # 5. 如果有优化策略，记录优化结果到MLflow / If optimized strategy exists, log optimization results to MLflow
+            if optimized_strategy and self._mlflow_tracker and self._mlflow_tracker.is_initialized():
+                try:
+                    self._logger.info("记录优化结果到MLflow / Logging optimization results to MLflow...")
+                    
+                    # 记录优化指标 / Log optimization metrics
+                    self._mlflow_tracker.log_metrics({
+                        "optimization_score": optimized_strategy.optimization_score,
+                        "expected_return": optimized_strategy.expected_return,
+                        "expected_risk": optimized_strategy.expected_risk,
+                        "target_return": optimized_strategy.target_return,
+                        "optimization_feasible": 1.0 if optimized_strategy.feasible else 0.0,
+                    })
+                    
+                    # 记录优化参数 / Log optimization parameters
+                    self._mlflow_tracker.log_params({
+                        "strategy_id": optimized_strategy.strategy_id,
+                        "rebalance_frequency": optimized_strategy.rebalance_frequency,
+                        "risk_tolerance": risk_tolerance,
+                        "asset_count": len(assets),
+                    })
+                    
+                    # 记录资产权重 / Log asset weights
+                    for asset, weight in optimized_strategy.asset_weights.items():
+                        self._mlflow_tracker.log_param(f"weight_{asset}", f"{weight:.4f}")
+                    
+                    # 记录警告信息 / Log warnings
+                    if optimized_strategy.warnings:
+                        warnings_text = "\n".join(optimized_strategy.warnings)
+                        self._mlflow_tracker.log_param("optimization_warnings", warnings_text[:250])  # MLflow限制参数长度
+                    
+                    self._logger.info("优化结果已记录到MLflow / Optimization results logged to MLflow")
+                    
+                except Exception as e:
+                    self._logger.warning(
+                        f"记录优化结果到MLflow失败 / Failed to log optimization results to MLflow: {str(e)}"
+                    )
+            
+            # 6. 记录建议的策略参数到结果 / Log suggested strategy parameters to result
+            self._logger.info(
+                f"目标导向训练完成 / Target-oriented training completed\n"
+                f"模型ID / Model ID: {result.model_id}\n"
+                f"训练时长 / Training time: {result.training_time:.2f}秒 / seconds"
+            )
+            
+            return result
+            
+        except Exception as e:
+            error_msg = f"目标导向训练失败 / Target-oriented training failed: {str(e)}"
+            self._logger.error(error_msg, exc_info=True)
+            raise TrainingManagerError(error_msg) from e
+    
     def list_templates(self) -> List:
         """
         列出所有可用的模板 / List All Available Templates
@@ -323,7 +502,7 @@ class TrainingManager:
         try:
             # 简化实现：直接使用qlib的D模块获取数据
             # 这样可以避免复杂的DataHandlerLP配置问题
-            from qlib.data import D
+            from qlib.data import D as QlibD
             import pandas as pd
             
             self._logger.info(
@@ -334,8 +513,17 @@ class TrainingManager:
             
             # 使用D.features直接获取数据
             # 这是qlib 0.9.7推荐的简单方式
-            data = D.features(
-                instruments=config.instruments,
+            # 注意：instruments 需要使用 D.instruments() 来获取股票列表
+            from qlib.data import D as QlibD
+            
+            # 如果 instruments 是字符串（如 "csi300"），需要转换为股票列表
+            if isinstance(config.instruments, str):
+                instruments_list = QlibD.instruments(config.instruments)
+            else:
+                instruments_list = config.instruments
+            
+            data = QlibD.features(
+                instruments=instruments_list,
                 fields=config.features,
                 start_time=config.start_time,
                 end_time=config.end_time,
@@ -349,8 +537,8 @@ class TrainingManager:
             
             # 添加标签列
             if config.label:
-                label_data = D.features(
-                    instruments=config.instruments,
+                label_data = QlibD.features(
+                    instruments=instruments_list,
                     fields=[config.label],
                     start_time=config.start_time,
                     end_time=config.end_time,

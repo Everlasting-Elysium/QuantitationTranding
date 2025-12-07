@@ -1,0 +1,548 @@
+# Market Configuration File / 市场配置文件
+# ============================================================================
+# 
+# 此文件定义了系统支持的所有市场及其资产类型
+# This file defines all markets and asset types supported by the system
+#
+# 配置说明 / Configuration Guide:
+# - markets: 市场列表，包括国内和国外市场
+# - asset_types: 每个市场支持的资产类型
+# - instruments_pools: 可选的股票池/基金池
+# - trading_hours: 交易时间配置
+# - data_source: 数据源配置
+#
+# 版本 / Version: 1.0
+# 最后更新 / Last Updated: 2024-12-07
+# ============================================================================
+
+markets:
+  # ========================================================================
+  # 中国市场 / Chinese Market (A-shares)
+  # ========================================================================
+  CN:
+    code: "CN"
+    name: "中国市场"
+    name_en: "Chinese Market"
+    region: "cn"
+    timezone: "Asia/Shanghai"
+    currency: "CNY"
+    currency_symbol: "¥"
+    
+    # 交易时间 / Trading Hours
+    trading_hours:
+      morning_start: "09:30"
+      morning_end: "11:30"
+      afternoon_start: "13:00"
+      afternoon_end: "15:00"
+      # 集合竞价 / Call Auction
+      call_auction_start: "09:15"
+      call_auction_end: "09:25"
+      # 尾盘集合竞价 / Closing Call Auction
+      closing_auction_start: "14:57"
+      closing_auction_end: "15:00"
+    
+    # 交易日历 / Trading Calendar
+    trading_calendar:
+      weekends: ["Saturday", "Sunday"]
+      holidays_source: "china_sse"  # 使用上交所交易日历
+    
+    # 市场特性 / Market Characteristics
+    characteristics:
+      t_plus_n: 1  # T+1交易制度
+      price_limit: 0.10  # 涨跌停限制 10%
+      price_limit_st: 0.05  # ST股票涨跌停限制 5%
+      min_trade_unit: 100  # 最小交易单位（手）
+      tick_size: 0.01  # 最小价格变动单位
+    
+    # 交易费用 / Trading Fees
+    fees:
+      commission_rate: 0.0003  # 佣金费率 0.03%
+      commission_min: 5.0  # 最低佣金 5元
+      stamp_duty: 0.001  # 印花税 0.1% (仅卖出)
+      transfer_fee: 0.00002  # 过户费 0.002%
+    
+    description: "中国A股市场，包括上海证券交易所和深圳证券交易所"
+    description_en: "Chinese A-share market, including Shanghai and Shenzhen Stock Exchanges"
+    
+    # 资产类型 / Asset Types
+    asset_types:
+      # 股票 / Stocks
+      stock:
+        code: "stock"
+        name: "股票"
+        name_en: "Stock"
+        description: "A股股票，包括主板、创业板、科创板等"
+        description_en: "A-share stocks, including main board, ChiNext, and STAR Market"
+        
+        # 可选股票池 / Available Stock Pools
+        instruments_pools:
+          - name: "csi300"
+            code: "000300.SH"
+            description: "沪深300指数成分股"
+            description_en: "CSI 300 Index constituents"
+            count: 300
+            
+          - name: "csi500"
+            code: "000905.SH"
+            description: "中证500指数成分股"
+            description_en: "CSI 500 Index constituents"
+            count: 500
+            
+          - name: "csi800"
+            code: "000906.SH"
+            description: "中证800指数成分股（沪深300+中证500）"
+            description_en: "CSI 800 Index constituents (CSI 300 + CSI 500)"
+            count: 800
+            
+          - name: "hs300"
+            code: "000300.SH"
+            description: "沪深300（同csi300）"
+            description_en: "HS 300 (same as CSI 300)"
+            count: 300
+            
+          - name: "zz500"
+            code: "000905.SH"
+            description: "中证500（同csi500）"
+            description_en: "ZZ 500 (same as CSI 500)"
+            count: 500
+            
+          - name: "all"
+            description: "全部A股（约5000只）"
+            description_en: "All A-shares (about 5000 stocks)"
+            count: 5000
+        
+        # 数据源配置 / Data Source Configuration
+        data_source: "qlib_cn"
+        data_frequency: ["1d", "1min"]  # 支持日线和分钟线
+        
+        # 特殊标记 / Special Marks
+        special_marks:
+          - "ST"   # 特别处理
+          - "*ST"  # 退市风险警示
+          - "N"    # 新股上市首日
+          - "C"    # 次新股
+        
+      # 基金 / Funds
+      fund:
+        code: "fund"
+        name: "基金"
+        name_en: "Fund"
+        description: "公募基金，包括股票型、混合型、债券型等"
+        description_en: "Public funds, including equity, mixed, and bond funds"
+        
+        # 可选基金池 / Available Fund Pools
+        instruments_pools:
+          - name: "equity_funds"
+            description: "股票型基金"
+            description_en: "Equity funds"
+            
+          - name: "mixed_funds"
+            description: "混合型基金"
+            description_en: "Mixed funds"
+            
+          - name: "bond_funds"
+            description: "债券型基金"
+            description_en: "Bond funds"
+            
+          - name: "index_funds"
+            description: "指数型基金"
+            description_en: "Index funds"
+        
+        data_source: "qlib_cn"
+        data_frequency: ["1d"]
+        
+      # ETF / Exchange Traded Funds
+      etf:
+        code: "etf"
+        name: "ETF"
+        name_en: "ETF"
+        description: "交易型开放式指数基金"
+        description_en: "Exchange Traded Funds"
+        
+        # 可选ETF池 / Available ETF Pools
+        instruments_pools:
+          - name: "stock_etf"
+            description: "股票ETF"
+            description_en: "Stock ETFs"
+            
+          - name: "bond_etf"
+            description: "债券ETF"
+            description_en: "Bond ETFs"
+            
+          - name: "commodity_etf"
+            description: "商品ETF"
+            description_en: "Commodity ETFs"
+            
+          - name: "cross_border_etf"
+            description: "跨境ETF"
+            description_en: "Cross-border ETFs"
+        
+        data_source: "qlib_cn"
+        data_frequency: ["1d", "1min"]
+  
+  # ========================================================================
+  # 美国市场 / US Market
+  # ========================================================================
+  US:
+    code: "US"
+    name: "美国市场"
+    name_en: "US Market"
+    region: "us"
+    timezone: "America/New_York"
+    currency: "USD"
+    currency_symbol: "$"
+    
+    # 交易时间 / Trading Hours (Eastern Time)
+    trading_hours:
+      # 常规交易 / Regular Trading
+      regular_start: "09:30"
+      regular_end: "16:00"
+      # 盘前交易 / Pre-market Trading
+      premarket_start: "04:00"
+      premarket_end: "09:30"
+      # 盘后交易 / After-hours Trading
+      afterhours_start: "16:00"
+      afterhours_end: "20:00"
+    
+    # 交易日历 / Trading Calendar
+    trading_calendar:
+      weekends: ["Saturday", "Sunday"]
+      holidays_source: "nyse"  # 使用纽交所交易日历
+    
+    # 市场特性 / Market Characteristics
+    characteristics:
+      t_plus_n: 2  # T+2结算制度
+      price_limit: null  # 无涨跌停限制
+      min_trade_unit: 1  # 最小交易单位（股）
+      tick_size: 0.01  # 最小价格变动单位
+      short_selling: true  # 允许做空
+    
+    # 交易费用 / Trading Fees
+    fees:
+      commission_rate: 0.0005  # 佣金费率 0.05%
+      commission_min: 1.0  # 最低佣金 $1
+      sec_fee: 0.0000221  # SEC费用
+      finra_taf: 0.000145  # FINRA交易活动费
+    
+    description: "美国股票市场，包括纽约证券交易所和纳斯达克"
+    description_en: "US stock market, including NYSE and NASDAQ"
+    
+    # 资产类型 / Asset Types
+    asset_types:
+      # 股票 / Stocks
+      stock:
+        code: "stock"
+        name: "股票"
+        name_en: "Stock"
+        description: "美股，包括NYSE和NASDAQ上市公司"
+        description_en: "US stocks, including NYSE and NASDAQ listed companies"
+        
+        # 可选股票池 / Available Stock Pools
+        instruments_pools:
+          - name: "sp500"
+            code: "SPX"
+            description: "标普500指数成分股"
+            description_en: "S&P 500 Index constituents"
+            count: 500
+            
+          - name: "nasdaq100"
+            code: "NDX"
+            description: "纳斯达克100指数成分股"
+            description_en: "NASDAQ 100 Index constituents"
+            count: 100
+            
+          - name: "dow30"
+            code: "DJI"
+            description: "道琼斯30指数成分股"
+            description_en: "Dow Jones 30 Index constituents"
+            count: 30
+            
+          - name: "russell2000"
+            code: "RUT"
+            description: "罗素2000指数成分股"
+            description_en: "Russell 2000 Index constituents"
+            count: 2000
+            
+          - name: "all"
+            description: "全部美股"
+            description_en: "All US stocks"
+            count: 8000
+        
+        data_source: "qlib_us"
+        data_frequency: ["1d", "1min"]
+        
+      # ETF / Exchange Traded Funds
+      etf:
+        code: "etf"
+        name: "ETF"
+        name_en: "ETF"
+        description: "美国交易所交易基金"
+        description_en: "US Exchange Traded Funds"
+        
+        # 可选ETF池 / Available ETF Pools
+        instruments_pools:
+          - name: "equity_etf"
+            description: "股票ETF"
+            description_en: "Equity ETFs"
+            
+          - name: "sector_etf"
+            description: "行业ETF"
+            description_en: "Sector ETFs"
+            
+          - name: "bond_etf"
+            description: "债券ETF"
+            description_en: "Bond ETFs"
+            
+          - name: "commodity_etf"
+            description: "商品ETF"
+            description_en: "Commodity ETFs"
+            
+          - name: "international_etf"
+            description: "国际ETF"
+            description_en: "International ETFs"
+        
+        data_source: "qlib_us"
+        data_frequency: ["1d", "1min"]
+  
+  # ========================================================================
+  # 香港市场 / Hong Kong Market
+  # ========================================================================
+  HK:
+    code: "HK"
+    name: "香港市场"
+    name_en: "Hong Kong Market"
+    region: "hk"
+    timezone: "Asia/Hong_Kong"
+    currency: "HKD"
+    currency_symbol: "HK$"
+    
+    # 交易时间 / Trading Hours
+    trading_hours:
+      # 早市 / Morning Session
+      morning_start: "09:30"
+      morning_end: "12:00"
+      # 午市 / Afternoon Session
+      afternoon_start: "13:00"
+      afternoon_end: "16:00"
+      # 开市前时段 / Pre-opening Session
+      preopen_start: "09:00"
+      preopen_end: "09:30"
+    
+    # 交易日历 / Trading Calendar
+    trading_calendar:
+      weekends: ["Saturday", "Sunday"]
+      holidays_source: "hkex"  # 使用港交所交易日历
+    
+    # 市场特性 / Market Characteristics
+    characteristics:
+      t_plus_n: 2  # T+2结算制度
+      price_limit: null  # 无涨跌停限制
+      min_trade_unit: 1  # 最小交易单位（股）
+      tick_size_rules:  # 价格变动单位规则
+        - price_range: [0.01, 0.25]
+          tick_size: 0.001
+        - price_range: [0.25, 0.50]
+          tick_size: 0.005
+        - price_range: [0.50, 10.00]
+          tick_size: 0.01
+        - price_range: [10.00, 20.00]
+          tick_size: 0.02
+        - price_range: [20.00, 100.00]
+          tick_size: 0.05
+        - price_range: [100.00, 200.00]
+          tick_size: 0.10
+        - price_range: [200.00, 500.00]
+          tick_size: 0.20
+        - price_range: [500.00, 1000.00]
+          tick_size: 0.50
+        - price_range: [1000.00, null]
+          tick_size: 1.00
+    
+    # 交易费用 / Trading Fees
+    fees:
+      commission_rate: 0.0025  # 佣金费率 0.25%
+      commission_min: 100.0  # 最低佣金 HK$100
+      stamp_duty: 0.0013  # 印花税 0.13%
+      trading_fee: 0.00005  # 交易费 0.005%
+      transaction_levy: 0.0000027  # 交易征费 0.00027%
+    
+    description: "香港证券交易所"
+    description_en: "Hong Kong Stock Exchange"
+    
+    # 资产类型 / Asset Types
+    asset_types:
+      # 股票 / Stocks
+      stock:
+        code: "stock"
+        name: "股票"
+        name_en: "Stock"
+        description: "港股，包括主板和创业板"
+        description_en: "Hong Kong stocks, including main board and GEM"
+        
+        # 可选股票池 / Available Stock Pools
+        instruments_pools:
+          - name: "hsi"
+            code: "HSI"
+            description: "恒生指数成分股"
+            description_en: "Hang Seng Index constituents"
+            count: 50
+            
+          - name: "hscei"
+            code: "HSCEI"
+            description: "恒生中国企业指数成分股"
+            description_en: "Hang Seng China Enterprises Index constituents"
+            count: 50
+            
+          - name: "hstech"
+            code: "HSTECH"
+            description: "恒生科技指数成分股"
+            description_en: "Hang Seng TECH Index constituents"
+            count: 30
+            
+          - name: "all"
+            description: "全部港股"
+            description_en: "All Hong Kong stocks"
+            count: 2500
+        
+        data_source: "qlib_hk"
+        data_frequency: ["1d", "1min"]
+        
+      # ETF / Exchange Traded Funds
+      etf:
+        code: "etf"
+        name: "ETF"
+        name_en: "ETF"
+        description: "香港交易所交易基金"
+        description_en: "Hong Kong Exchange Traded Funds"
+        
+        instruments_pools:
+          - name: "equity_etf"
+            description: "股票ETF"
+            description_en: "Equity ETFs"
+            
+          - name: "bond_etf"
+            description: "债券ETF"
+            description_en: "Bond ETFs"
+        
+        data_source: "qlib_hk"
+        data_frequency: ["1d"]
+
+# ============================================================================
+# 默认配置 / Default Configuration
+# ============================================================================
+default_market: "CN"
+default_asset_type: "stock"
+default_instruments_pool: "csi300"
+
+# ============================================================================
+# 市场组合 / Market Combinations
+# ============================================================================
+# 预定义的市场组合，用于跨市场投资
+# Predefined market combinations for cross-market investment
+
+market_combinations:
+  # 大中华区 / Greater China
+  greater_china:
+    name: "大中华区"
+    name_en: "Greater China"
+    markets: ["CN", "HK"]
+    description: "中国大陆和香港市场"
+    description_en: "Mainland China and Hong Kong markets"
+    
+  # 中美市场 / China-US Markets
+  china_us:
+    name: "中美市场"
+    name_en: "China-US Markets"
+    markets: ["CN", "US"]
+    description: "中国和美国市场"
+    description_en: "China and US markets"
+    
+  # 全球市场 / Global Markets
+  global:
+    name: "全球市场"
+    name_en: "Global Markets"
+    markets: ["CN", "US", "HK"]
+    description: "中国、美国和香港市场"
+    description_en: "China, US, and Hong Kong markets"
+
+# ============================================================================
+# 数据源配置 / Data Source Configuration
+# ============================================================================
+data_sources:
+  qlib_cn:
+    provider: "qlib"
+    region: "cn"
+    data_dir: "~/.qlib/qlib_data/cn_data"
+    freq: ["day", "1min"]
+    
+  qlib_us:
+    provider: "qlib"
+    region: "us"
+    data_dir: "~/.qlib/qlib_data/us_data"
+    freq: ["day", "1min"]
+    
+  qlib_hk:
+    provider: "qlib"
+    region: "hk"
+    data_dir: "~/.qlib/qlib_data/hk_data"
+    freq: ["day"]
+
+# ============================================================================
+# 市场状态 / Market Status
+# ============================================================================
+# 用于判断市场是否开市
+# Used to determine if the market is open
+
+market_status:
+  check_interval: 60  # 检查间隔（秒）/ Check interval (seconds)
+  cache_duration: 300  # 缓存时长（秒）/ Cache duration (seconds)
+  
+  # 特殊日期处理 / Special Date Handling
+  special_dates:
+    # 中国市场特殊交易日
+    CN:
+      # 春节调休交易日 / Spring Festival adjusted trading days
+      adjusted_trading_days: []
+      # 临时休市日 / Temporary non-trading days
+      temporary_closures: []
+    
+    # 美国市场特殊交易日
+    US:
+      # 提前收市日 / Early closure days
+      early_closures: []
+      # 临时休市日 / Temporary non-trading days
+      temporary_closures: []
+    
+    # 香港市场特殊交易日
+    HK:
+      # 台风休市 / Typhoon closures
+      typhoon_closures: []
+      # 临时休市日 / Temporary non-trading days
+      temporary_closures: []
+
+# ============================================================================
+# 市场数据质量配置 / Market Data Quality Configuration
+# ============================================================================
+data_quality:
+  # 数据完整性检查 / Data Completeness Check
+  completeness_threshold: 0.95  # 95%的数据完整性
+  
+  # 数据延迟容忍度 / Data Delay Tolerance
+  max_delay_minutes:
+    CN: 15  # 中国市场最大延迟15分钟
+    US: 15  # 美国市场最大延迟15分钟
+    HK: 15  # 香港市场最大延迟15分钟
+  
+  # 异常值检测 / Outlier Detection
+  outlier_detection:
+    enabled: true
+    price_change_threshold: 0.20  # 单日价格变动超过20%视为异常
+    volume_change_threshold: 5.0  # 成交量变动超过5倍视为异常
+
+# ============================================================================
+# 备注 / Notes
+# ============================================================================
+# 1. 所有时间均为当地时间 / All times are in local timezone
+# 2. 交易费用仅供参考，实际费用以券商为准 / Trading fees are for reference only
+# 3. 数据源需要单独配置和下载 / Data sources need separate configuration and download
+# 4. 市场特性可能随政策调整而变化 / Market characteristics may change with policy adjustments

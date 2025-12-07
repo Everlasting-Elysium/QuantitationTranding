@@ -47,6 +47,16 @@
   - 数据下载
   - 环境配置
 
+#### 基础设施文档
+
+- **[notification_service.md](notification_service.md)** - 通知服务文档
+  - 邮件通知配置和使用
+  - 短信通知配置和使用
+  - 系统通知和日志
+  - 风险预警通知
+  - 常用邮箱配置
+  - 故障排除
+
 ### 📝 文档说明
 
 所有文档均使用**中英双语**编写，旨在帮助新手和专业用户快速上手量化交易系统。
@@ -88,6 +98,7 @@ docs/
 ├── user_guide.md          # 用户手册（完整功能）
 ├── api_reference.md       # API参考（开发者）
 ├── initialization.md      # 初始化指南
+├── notification_service.md # 通知服务文档
 ├── cli_usage.md          # CLI使用说明
 ├── backtest_cli_usage.md # 回测CLI说明
 ├── signal_cli_usage.md   # 信号CLI说明

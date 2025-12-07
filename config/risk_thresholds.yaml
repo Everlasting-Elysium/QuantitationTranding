@@ -1,0 +1,530 @@
+# Risk Thresholds Configuration File / 风险阈值配置文件
+# ============================================================================
+# 
+# 此文件定义了不同风险偏好下的风险控制阈值和预警级别
+# This file defines risk control thresholds and alert levels for different risk preferences
+#
+# 配置说明 / Configuration Guide:
+# - risk_profiles: 风险偏好配置（保守、稳健、积极、激进）
+# - position_limits: 仓位限制
+# - loss_limits: 亏损限制
+# - volatility_limits: 波动率限制
+# - alert_levels: 预警级别配置
+#
+# 版本 / Version: 1.0
+# 最后更新 / Last Updated: 2024-12-07
+# ============================================================================
+
+# ============================================================================
+# 风险偏好配置 / Risk Preference Profiles
+# ============================================================================
+# 系统提供四种预定义的风险偏好配置
+# The system provides four predefined risk preference profiles
+
+risk_profiles:
+  # ========================================================================
+  # 保守型 / Conservative
+  # ========================================================================
+  # 适合风险承受能力较低的投资者
+  # Suitable for investors with low risk tolerance
+  conservative:
+    name: "保守型"
+    name_en: "Conservative"
+    description: "追求稳健收益，严格控制风险，适合风险承受能力较低的投资者"
+    description_en: "Pursue stable returns with strict risk control, suitable for low risk tolerance investors"
+    
+    # 仓位限制 / Position Limits
+    position_limits:
+      # 单只股票最大仓位 / Max single stock position
+      max_single_position: 0.15  # 15%
+      
+      # 单个行业最大集中度 / Max sector concentration
+      max_sector_concentration: 0.25  # 25%
+      
+      # 最大总仓位 / Max total position
+      max_total_position: 0.60  # 60%
+      
+      # 最小现金比例 / Min cash ratio
+      min_cash_ratio: 0.40  # 40%
+      
+      # 最小持仓数量 / Min number of positions
+      min_positions: 8
+      
+      # 最大持仓数量 / Max number of positions
+      max_positions: 15
+    
+    # 亏损限制 / Loss Limits
+    loss_limits:
+      # 最大单日亏损 / Max daily loss
+      max_daily_loss: 0.02  # 2%
+      
+      # 最大单周亏损 / Max weekly loss
+      max_weekly_loss: 0.05  # 5%
+      
+      # 最大单月亏损 / Max monthly loss
+      max_monthly_loss: 0.08  # 8%
+      
+      # 最大总亏损（从最高点）/ Max total loss (from peak)
+      max_total_loss: 0.10  # 10%
+      
+      # 单只股票最大亏损 / Max single stock loss
+      max_single_stock_loss: 0.08  # 8%
+    
+    # 止损策略 / Stop Loss Strategy
+    stop_loss:
+      # 固定止损比例 / Fixed stop loss percentage
+      fixed_stop_loss_pct: 0.05  # 5%
+      
+      # 移动止损比例 / Trailing stop loss percentage
+      trailing_stop_pct: 0.03  # 3%
+      
+      # 是否启用移动止损 / Enable trailing stop
+      enable_trailing_stop: true
+      
+      # 止损触发后的冷静期（天）/ Cooldown period after stop loss (days)
+      cooldown_days: 3
+    
+    # 波动率限制 / Volatility Limits
+    volatility_limits:
+      # 最大组合波动率 / Max portfolio volatility
+      max_portfolio_volatility: 0.15  # 15%
+      
+      # 最大单只股票波动率 / Max single stock volatility
+      max_single_stock_volatility: 0.30  # 30%
+      
+      # 波动率计算窗口（天）/ Volatility calculation window (days)
+      volatility_window: 20
+    
+    # 回撤限制 / Drawdown Limits
+    drawdown_limits:
+      # 最大回撤 / Max drawdown
+      max_drawdown: 0.12  # 12%
+      
+      # 回撤预警阈值 / Drawdown warning threshold
+      drawdown_warning: 0.08  # 8%
+      
+      # 回撤计算窗口（天）/ Drawdown calculation window (days)
+      drawdown_window: 60
+    
+    # 杠杆限制 / Leverage Limits
+    leverage_limits:
+      # 最大杠杆倍数 / Max leverage ratio
+      max_leverage: 1.0  # 不使用杠杆 / No leverage
+      
+      # 是否允许融资融券 / Allow margin trading
+      allow_margin: false
+    
+    # 流动性要求 / Liquidity Requirements
+    liquidity_requirements:
+      # 最小日均成交额（万元）/ Min daily average volume (10k CNY)
+      min_daily_volume: 5000  # 5000万元
+      
+      # 最小换手率 / Min turnover rate
+      min_turnover_rate: 0.01  # 1%
+      
+      # 最大买卖价差 / Max bid-ask spread
+      max_bid_ask_spread: 0.02  # 2%
+
+  # ========================================================================
+  # 稳健型 / Moderate
+  # ========================================================================
+  # 适合风险承受能力中等的投资者
+  # Suitable for investors with moderate risk tolerance
+  moderate:
+    name: "稳健型"
+    name_en: "Moderate"
+    description: "平衡风险与收益，适合风险承受能力中等的投资者"
+    description_en: "Balance risk and return, suitable for moderate risk tolerance investors"
+    
+    # 仓位限制 / Position Limits
+    position_limits:
+      max_single_position: 0.20  # 20%
+      max_sector_concentration: 0.35  # 35%
+      max_total_position: 0.75  # 75%
+      min_cash_ratio: 0.25  # 25%
+      min_positions: 6
+      max_positions: 12
+    
+    # 亏损限制 / Loss Limits
+    loss_limits:
+      max_daily_loss: 0.03  # 3%
+      max_weekly_loss: 0.08  # 8%
+      max_monthly_loss: 0.12  # 12%
+      max_total_loss: 0.15  # 15%
+      max_single_stock_loss: 0.10  # 10%
+    
+    # 止损策略 / Stop Loss Strategy
+    stop_loss:
+      fixed_stop_loss_pct: 0.07  # 7%
+      trailing_stop_pct: 0.04  # 4%
+      enable_trailing_stop: true
+      cooldown_days: 2
+    
+    # 波动率限制 / Volatility Limits
+    volatility_limits:
+      max_portfolio_volatility: 0.20  # 20%
+      max_single_stock_volatility: 0.40  # 40%
+      volatility_window: 20
+    
+    # 回撤限制 / Drawdown Limits
+    drawdown_limits:
+      max_drawdown: 0.18  # 18%
+      drawdown_warning: 0.12  # 12%
+      drawdown_window: 60
+    
+    # 杠杆限制 / Leverage Limits
+    leverage_limits:
+      max_leverage: 1.2  # 1.2倍杠杆
+      allow_margin: true
+    
+    # 流动性要求 / Liquidity Requirements
+    liquidity_requirements:
+      min_daily_volume: 3000  # 3000万元
+      min_turnover_rate: 0.008  # 0.8%
+      max_bid_ask_spread: 0.03  # 3%
+
+  # ========================================================================
+  # 积极型 / Aggressive
+  # ========================================================================
+  # 适合风险承受能力较高的投资者
+  # Suitable for investors with high risk tolerance
+  aggressive:
+    name: "积极型"
+    name_en: "Aggressive"
+    description: "追求较高收益，可承受较大风险，适合风险承受能力较高的投资者"
+    description_en: "Pursue higher returns with higher risk tolerance, suitable for high risk tolerance investors"
+    
+    # 仓位限制 / Position Limits
+    position_limits:
+      max_single_position: 0.30  # 30%
+      max_sector_concentration: 0.45  # 45%
+      max_total_position: 0.85  # 85%
+      min_cash_ratio: 0.15  # 15%
+      min_positions: 5
+      max_positions: 10
+    
+    # 亏损限制 / Loss Limits
+    loss_limits:
+      max_daily_loss: 0.05  # 5%
+      max_weekly_loss: 0.12  # 12%
+      max_monthly_loss: 0.18  # 18%
+      max_total_loss: 0.25  # 25%
+      max_single_stock_loss: 0.15  # 15%
+    
+    # 止损策略 / Stop Loss Strategy
+    stop_loss:
+      fixed_stop_loss_pct: 0.10  # 10%
+      trailing_stop_pct: 0.06  # 6%
+      enable_trailing_stop: true
+      cooldown_days: 1
+    
+    # 波动率限制 / Volatility Limits
+    volatility_limits:
+      max_portfolio_volatility: 0.30  # 30%
+      max_single_stock_volatility: 0.50  # 50%
+      volatility_window: 20
+    
+    # 回撤限制 / Drawdown Limits
+    drawdown_limits:
+      max_drawdown: 0.25  # 25%
+      drawdown_warning: 0.18  # 18%
+      drawdown_window: 60
+    
+    # 杠杆限制 / Leverage Limits
+    leverage_limits:
+      max_leverage: 1.5  # 1.5倍杠杆
+      allow_margin: true
+    
+    # 流动性要求 / Liquidity Requirements
+    liquidity_requirements:
+      min_daily_volume: 2000  # 2000万元
+      min_turnover_rate: 0.005  # 0.5%
+      max_bid_ask_spread: 0.05  # 5%
+
+  # ========================================================================
+  # 激进型 / Very Aggressive
+  # ========================================================================
+  # 适合风险承受能力很高的专业投资者
+  # Suitable for professional investors with very high risk tolerance
+  very_aggressive:
+    name: "激进型"
+    name_en: "Very Aggressive"
+    description: "追求最高收益，可承受很大风险，适合专业投资者"
+    description_en: "Pursue maximum returns with very high risk tolerance, suitable for professional investors"
+    
+    # 仓位限制 / Position Limits
+    position_limits:
+      max_single_position: 0.40  # 40%
+      max_sector_concentration: 0.60  # 60%
+      max_total_position: 0.95  # 95%
+      min_cash_ratio: 0.05  # 5%
+      min_positions: 3
+      max_positions: 8
+    
+    # 亏损限制 / Loss Limits
+    loss_limits:
+      max_daily_loss: 0.08  # 8%
+      max_weekly_loss: 0.18  # 18%
+      max_monthly_loss: 0.30  # 30%
+      max_total_loss: 0.40  # 40%
+      max_single_stock_loss: 0.20  # 20%
+    
+    # 止损策略 / Stop Loss Strategy
+    stop_loss:
+      fixed_stop_loss_pct: 0.15  # 15%
+      trailing_stop_pct: 0.10  # 10%
+      enable_trailing_stop: false  # 不使用移动止损
+      cooldown_days: 0
+    
+    # 波动率限制 / Volatility Limits
+    volatility_limits:
+      max_portfolio_volatility: 0.50  # 50%
+      max_single_stock_volatility: 0.80  # 80%
+      volatility_window: 20
+    
+    # 回撤限制 / Drawdown Limits
+    drawdown_limits:
+      max_drawdown: 0.40  # 40%
+      drawdown_warning: 0.30  # 30%
+      drawdown_window: 60
+    
+    # 杠杆限制 / Leverage Limits
+    leverage_limits:
+      max_leverage: 2.0  # 2倍杠杆
+      allow_margin: true
+    
+    # 流动性要求 / Liquidity Requirements
+    liquidity_requirements:
+      min_daily_volume: 1000  # 1000万元
+      min_turnover_rate: 0.003  # 0.3%
+      max_bid_ask_spread: 0.08  # 8%
+
+# ============================================================================
+# 预警级别配置 / Alert Level Configuration
+# ============================================================================
+# 定义四个预警级别：正常、注意、警告、危险
+# Define four alert levels: Normal, Caution, Warning, Danger
+
+alert_levels:
+  # 正常 / Normal
+  normal:
+    level: 0
+    name: "正常"
+    name_en: "Normal"
+    color: "green"
+    icon: "🟢"
+    description: "所有风险指标在正常范围内"
+    description_en: "All risk metrics within normal range"
+    
+    # 触发条件 / Trigger Conditions
+    conditions:
+      # 当日亏损 < 最大单日亏损的50%
+      daily_loss_ratio: 0.50
+      # 总亏损 < 最大总亏损的30%
+      total_loss_ratio: 0.30
+      # 回撤 < 最大回撤的40%
+      drawdown_ratio: 0.40
+      # 波动率 < 最大波动率的60%
+      volatility_ratio: 0.60
+    
+    # 处理动作 / Actions
+    actions:
+      - "continue_trading"  # 继续交易
+      - "normal_monitoring"  # 正常监控
+  
+  # 注意 / Caution
+  caution:
+    level: 1
+    name: "注意"
+    name_en: "Caution"
+    color: "yellow"
+    icon: "🟡"
+    description: "部分风险指标接近阈值，需要密切关注"
+    description_en: "Some risk metrics approaching thresholds, need close attention"
+    
+    # 触发条件 / Trigger Conditions
+    conditions:
+      # 当日亏损 >= 最大单日亏损的50%
+      daily_loss_ratio: 0.50
+      # 总亏损 >= 最大总亏损的30%
+      total_loss_ratio: 0.30
+      # 回撤 >= 最大回撤的40%
+      drawdown_ratio: 0.40
+      # 波动率 >= 最大波动率的60%
+      volatility_ratio: 0.60
+    
+    # 处理动作 / Actions
+    actions:
+      - "continue_trading"  # 继续交易
+      - "increase_monitoring"  # 增加监控频率
+      - "send_notification"  # 发送通知
+      - "review_positions"  # 审查持仓
+  
+  # 警告 / Warning
+  warning:
+    level: 2
+    name: "警告"
+    name_en: "Warning"
+    color: "orange"
+    icon: "🟠"
+    description: "多项风险指标超标，需要采取措施"
+    description_en: "Multiple risk metrics exceeded, actions required"
+    
+    # 触发条件 / Trigger Conditions
+    conditions:
+      # 当日亏损 >= 最大单日亏损的75%
+      daily_loss_ratio: 0.75
+      # 总亏损 >= 最大总亏损的60%
+      total_loss_ratio: 0.60
+      # 回撤 >= 最大回撤的70%
+      drawdown_ratio: 0.70
+      # 波动率 >= 最大波动率的80%
+      volatility_ratio: 0.80
+    
+    # 处理动作 / Actions
+    actions:
+      - "reduce_positions"  # 减少仓位
+      - "tighten_stop_loss"  # 收紧止损
+      - "send_alert"  # 发送预警
+      - "increase_monitoring"  # 增加监控频率
+      - "review_strategy"  # 审查策略
+  
+  # 危险 / Danger
+  danger:
+    level: 3
+    name: "危险"
+    name_en: "Danger"
+    color: "red"
+    icon: "🔴"
+    description: "严重风险，需要立即采取行动"
+    description_en: "Severe risk, immediate action required"
+    
+    # 触发条件 / Trigger Conditions
+    conditions:
+      # 当日亏损 >= 最大单日亏损的90%
+      daily_loss_ratio: 0.90
+      # 总亏损 >= 最大总亏损的85%
+      total_loss_ratio: 0.85
+      # 回撤 >= 最大回撤的90%
+      drawdown_ratio: 0.90
+      # 波动率 >= 最大波动率的100%
+      volatility_ratio: 1.00
+    
+    # 处理动作 / Actions
+    actions:
+      - "stop_trading"  # 停止交易
+      - "liquidate_positions"  # 平仓
+      - "send_emergency_alert"  # 发送紧急预警
+      - "notify_admin"  # 通知管理员
+      - "generate_report"  # 生成报告
+
+# ============================================================================
+# 风险监控配置 / Risk Monitoring Configuration
+# ============================================================================
+risk_monitoring:
+  # 监控频率 / Monitoring Frequency
+  monitoring_frequency:
+    # 正常情况下的监控间隔（秒）/ Normal monitoring interval (seconds)
+    normal: 300  # 5分钟
+    
+    # 注意级别的监控间隔（秒）/ Caution level monitoring interval (seconds)
+    caution: 120  # 2分钟
+    
+    # 警告级别的监控间隔（秒）/ Warning level monitoring interval (seconds)
+    warning: 60  # 1分钟
+    
+    # 危险级别的监控间隔（秒）/ Danger level monitoring interval (seconds)
+    danger: 30  # 30秒
+  
+  # 风险指标计算 / Risk Metrics Calculation
+  metrics_calculation:
+    # 是否启用实时计算 / Enable real-time calculation
+    enable_realtime: true
+    
+    # 历史数据窗口（天）/ Historical data window (days)
+    history_window: 252  # 一年交易日
+    
+    # 是否使用指数加权 / Use exponential weighting
+    use_exponential_weighting: true
+    
+    # 指数加权衰减因子 / Exponential decay factor
+    decay_factor: 0.94
+  
+  # 预警通知 / Alert Notifications
+  notifications:
+    # 是否启用邮件通知 / Enable email notifications
+    enable_email: true
+    
+    # 是否启用短信通知 / Enable SMS notifications
+    enable_sms: false
+    
+    # 是否启用系统通知 / Enable system notifications
+    enable_system: true
+    
+    # 通知延迟（秒）/ Notification delay (seconds)
+    notification_delay: 10
+    
+    # 相同预警的最小间隔（秒）/ Min interval for same alert (seconds)
+    min_alert_interval: 300  # 5分钟
+  
+  # 自动处理 / Automatic Actions
+  automatic_actions:
+    # 是否启用自动处理 / Enable automatic actions
+    enabled: true
+    
+    # 需要用户确认的动作 / Actions requiring user confirmation
+    require_confirmation:
+      - "stop_trading"
+      - "liquidate_positions"
+    
+    # 自动执行的动作 / Auto-execute actions
+    auto_execute:
+      - "reduce_positions"
+      - "tighten_stop_loss"
+      - "send_notification"
+
+# ============================================================================
+# 默认配置 / Default Configuration
+# ============================================================================
+default_risk_profile: "moderate"  # 默认使用稳健型
+default_alert_level: "normal"  # 默认预警级别为正常
+
+# ============================================================================
+# 风险评估配置 / Risk Assessment Configuration
+# ============================================================================
+risk_assessment:
+  # 评估频率 / Assessment Frequency
+  assessment_frequency: "daily"  # daily, weekly, monthly
+  
+  # 评估指标 / Assessment Metrics
+  metrics:
+    - "sharpe_ratio"  # 夏普比率
+    - "max_drawdown"  # 最大回撤
+    - "volatility"  # 波动率
+    - "var_95"  # 95% VaR
+    - "cvar_95"  # 95% CVaR
+    - "beta"  # Beta系数
+    - "alpha"  # Alpha系数
+  
+  # 评估报告 / Assessment Reports
+  reports:
+    # 是否生成报告 / Generate reports
+    generate: true
+    
+    # 报告格式 / Report format
+    format: ["html", "pdf"]
+    
+    # 报告保存路径 / Report save path
+    save_path: "reports/risk_assessment"
+
+# ============================================================================
+# 备注 / Notes
+# ============================================================================
+# 1. 所有比例值均为小数形式（如0.10表示10%）
+#    All ratio values are in decimal form (e.g., 0.10 means 10%)
+# 2. 风险阈值应根据实际情况和个人风险承受能力调整
+#    Risk thresholds should be adjusted based on actual situation and personal risk tolerance
+# 3. 建议定期回顾和更新风险配置
+#    It's recommended to regularly review and update risk configuration
+# 4. 实盘交易前务必进行充分的模拟测试
+#    Conduct thorough simulation testing before live trading

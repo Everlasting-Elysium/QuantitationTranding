@@ -29,6 +29,8 @@ from .data_manager import (
 )
 
 from .model_factory import ModelFactory
+from .portfolio_manager import PortfolioManager
+from .risk_manager import RiskManager
 
 __all__ = [
     'ConfigManager',
@@ -50,5 +52,7 @@ __all__ = [
     'MissingValueStrategy',
     'ValidationResult',
     'DataInfo',
-    'ModelFactory'
+    'ModelFactory',
+    'PortfolioManager',
+    'RiskManager'
 ]

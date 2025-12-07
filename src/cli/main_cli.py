@@ -40,6 +40,12 @@ class MainCLI:
         # Menu options and their handlers
         # 菜单选项及其处理器
         self.menu_options: Dict[str, Dict[str, any]] = {
+            "0": {
+                "name": "🎯 引导式工作流程 / Guided Workflow",
+                "handler": self._handle_guided_workflow,
+                "description": "完整的投资流程引导（推荐新手使用）/ Complete investment process guidance (Recommended for beginners)",
+                "highlight": True
+            },
             "1": {
                 "name": "模型训练 / Model Training",
                 "handler": self._handle_training,
@@ -110,12 +116,22 @@ class MainCLI:
         Display the main menu.
         显示主菜单。
         
-        Validates: Requirements 12.1
+        Validates: Requirements 12.1, 22.1
         """
         print("\n" + "=" * 70)
         print("📊 量化交易系统 - 主菜单 / Quantitative Trading System - Main Menu")
         print("=" * 70)
         print()
+        
+        # Display highlighted option (guided workflow)
+        # 显示高亮选项（引导式工作流程）
+        if "0" in self.menu_options:
+            option = self.menu_options["0"]
+            print("  " + "⭐" * 35)
+            print(f"  {option['name']}")
+            print(f"  {option['description']}")
+            print("  " + "⭐" * 35)
+            print()
         
         # Display numbered options
         # 显示编号选项
@@ -164,6 +180,8 @@ class MainCLI:
         """
         Display welcome message.
         显示欢迎消息。
+        
+        Validates: Requirements 22.1
         """
         print("\n" + "=" * 70)
         print("🎉 欢迎使用量化交易系统！ / Welcome to Quantitative Trading System!")
@@ -178,6 +196,11 @@ class MainCLI:
         print("  • 实时信号生成 / Real-time signal generation")
         print("  • 数据管理工具 / Data management tools")
         print("  • 模型版本管理 / Model version management")
+        print()
+        print("⭐ 新功能 / New Feature:")
+        print("  🎯 引导式工作流程 - 完整的投资流程引导（推荐新手使用）")
+        print("  🎯 Guided Workflow - Complete investment process guidance (Recommended for beginners)")
+        print("     选择选项 0 开始 / Select option 0 to start")
         print()
         print("提示：输入 'h' 可随时查看帮助信息 / Tip: Enter 'h' anytime for help")
         print("=" * 70)
@@ -205,6 +228,18 @@ class MainCLI:
         
         print("【主要功能 / Main Features】")
         print()
+        
+        # 特别突出引导式工作流程 / Highlight guided workflow
+        if "0" in self.menu_options:
+            option = self.menu_options["0"]
+            print("⭐ 推荐功能 / Recommended Feature:")
+            print(f"0. {option['name']}")
+            print(f"   {option['description']}")
+            print("   适合：新手用户、完整流程需求")
+            print("   Suitable for: Beginners, complete workflow needs")
+            print()
+        
+        print("其他功能 / Other Features:")
         for key in ["1", "2", "3", "4", "5", "6"]:
             option = self.menu_options[key]
             print(f"{key}. {option['name']}")
@@ -2587,6 +2622,97 @@ class MainCLI:
             traceback.print_exc()
         finally:
             input("\n按回车键返回 / Press Enter to return...")
+    
+    def _handle_guided_workflow(self) -> None:
+        """
+        Handle guided workflow menu.
+        处理引导式工作流程菜单。
+        
+        Validates: Requirements 22.1, 22.2, 22.3, 22.5
+        """
+        try:
+            print("\n" + "=" * 70)
+            print("🎯 引导式工作流程 / Guided Workflow")
+            print("=" * 70)
+            print()
+            
+            # 显示引导式工作流程介绍 / Display guided workflow introduction
+            print("欢迎使用引导式工作流程！")
+            print("Welcome to the Guided Workflow!")
+            print()
+            print("本系统将引导您完成以下10个步骤：")
+            print("This system will guide you through the following 10 steps:")
+            print()
+            print("  1. 市场和资产选择 / Market and Asset Selection")
+            print("  2. 智能推荐 / Intelligent Recommendation")
+            print("  3. 目标设定 / Target Setting")
+            print("  4. 策略优化 / Strategy Optimization")
+            print("  5. 模型训练 / Model Training")
+            print("  6. 历史回测 / Historical Backtest")
+            print("  7. 模拟交易 / Simulation Trading")
+            print("  8. 实盘交易设置 / Live Trading Setup")
+            print("  9. 实盘交易执行 / Live Trading Execution")
+            print("  10. 报告配置 / Reporting Configuration")
+            print()
+            print("特点 / Features:")
+            print("  ✓ 无需编程知识 / No programming knowledge required")
+            print("  ✓ 进度自动保存 / Progress automatically saved")
+            print("  ✓ 可随时暂停和继续 / Can pause and resume anytime")
+            print("  ✓ 支持返回修改 / Support go back to modify")
+            print("  ✓ 中英双语界面 / Bilingual interface")
+            print()
+            print("=" * 70)
+            
+            # 询问是否开始 / Ask if start
+            if not self.prompt.confirm(
+                "\n是否开始引导式工作流程？ / Start guided workflow?",
+                default=True
+            ):
+                print("\n已取消 / Cancelled")
+                return
+            
+            # 导入并启动引导式工作流程 / Import and start guided workflow
+            from .guided_workflow import GuidedWorkflow
+            
+            # 创建工作流实例 / Create workflow instance
+            workflow = GuidedWorkflow(state_dir="./workflow_states")
+            
+            # 启动工作流 / Start workflow
+            print("\n" + "=" * 70)
+            print("🚀 启动引导式工作流程 / Starting Guided Workflow")
+            print("=" * 70)
+            print()
+            
+            workflow.start(resume=True)
+            
+            # 工作流完成后返回主菜单 / Return to main menu after workflow completion
+            print("\n" + "=" * 70)
+            print("✅ 引导式工作流程已完成或暂停")
+            print("✅ Guided workflow completed or paused")
+            print("=" * 70)
+            print()
+            print("您可以：")
+            print("You can:")
+            print("  • 再次选择选项 0 继续未完成的工作流程")
+            print("    Select option 0 again to continue incomplete workflow")
+            print("  • 使用其他菜单选项进行单独操作")
+            print("    Use other menu options for individual operations")
+            print("  • 查看 workflow_states/ 目录中的配置总结")
+            print("    View configuration summary in workflow_states/ directory")
+            print()
+            
+        except KeyboardInterrupt:
+            print("\n\n⚠️  引导式工作流程已中断")
+            print("⚠️  Guided workflow interrupted")
+            print("\n进度已保存，下次可以继续")
+            print("Progress saved, you can continue next time")
+        except Exception as e:
+            print(f"\n❌ 引导式工作流程执行失败 / Guided workflow execution failed")
+            print(f"错误信息 / Error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+        finally:
+            input("\n按回车键返回主菜单 / Press Enter to return to main menu...")
     
     def _export_model_info(self, model_info, metadata: Dict[str, Any]) -> None:
         """

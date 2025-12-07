@@ -41,6 +41,30 @@ from .signal_generator import (
     SignalGeneratorError
 )
 
+from .market_selector import (
+    MarketSelector
+)
+
+from .performance_analyzer import (
+    PerformanceAnalyzer
+)
+
+from .strategy_optimizer import (
+    StrategyOptimizer
+)
+
+from .simulation_engine import (
+    SimulationEngine,
+    SimulationSession,
+    SimulationStepResult,
+    SimulationReport,
+    SimulationEngineError
+)
+
+from .live_trading_manager import (
+    LiveTradingManager
+)
+
 __all__ = [
     "TrainingManager",
     "TrainingConfig",
@@ -62,4 +86,13 @@ __all__ = [
     "ReportGeneratorError",
     "SignalGenerator",
     "SignalGeneratorError",
+    "MarketSelector",
+    "PerformanceAnalyzer",
+    "StrategyOptimizer",
+    "SimulationEngine",
+    "SimulationSession",
+    "SimulationStepResult",
+    "SimulationReport",
+    "SimulationEngineError",
+    "LiveTradingManager",
 ]

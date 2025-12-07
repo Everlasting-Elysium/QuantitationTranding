@@ -10,6 +10,13 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
+# 检查 qlib 是否可用
+try:
+    import qlib
+    QLIB_AVAILABLE = True
+except ImportError:
+    QLIB_AVAILABLE = False
+
 from src.core.config_manager import ConfigManager
 from src.core.data_manager import DataManager
 from src.core.model_factory import ModelFactory
@@ -20,6 +27,9 @@ from src.application.model_registry import ModelRegistry
 from src.infrastructure.qlib_wrapper import QlibWrapper
 from src.infrastructure.logger_system import setup_logging
 from src.utils.cache_manager import get_cache_manager
+
+# 如果 qlib 不可用，跳过所有集成测试
+pytestmark = pytest.mark.skipif(not QLIB_AVAILABLE, reason="qlib not available")
 
 
 class TestEndToEndWorkflow:
@@ -60,6 +70,8 @@ class TestEndToEndWorkflow:
         # 清理
         shutil.rmtree(temp_dir, ignore_errors=True)
     
+    @pytest.mark.integration
+    @pytest.mark.requires_data
     def test_complete_training_workflow(self, test_env):
         """
         测试完整的训练工作流程 / Test complete training workflow
@@ -77,6 +89,11 @@ class TestEndToEndWorkflow:
         data_path = Path(config.qlib.provider_uri).expanduser()
         if not data_path.exists():
             pytest.skip(f"Qlib数据不可用: {data_path}")
+        
+        # 检查数据是否已解压
+        data_files = list(data_path.glob("*"))
+        if len(data_files) == 1 and data_files[0].suffix == ".zip":
+            pytest.skip(f"Qlib数据未解压: {data_path}")
         
         try:
             # 1. 初始化数据管理器
@@ -129,7 +146,13 @@ class TestEndToEndWorkflow:
                 experiment_name="test_experiment"
             )
             
-            result = training_manager.train_model(train_config)
+            try:
+                result = training_manager.train_model(train_config)
+            except Exception as e:
+                # 如果是数据不存在的错误，跳过测试
+                if "does not contain data" in str(e) or "No data retrieved" in str(e):
+                    pytest.skip(f"Qlib数据未正确配置或不完整: {str(e)}")
+                raise
             
             # 验证训练结果
             assert result is not None, "训练结果为空"
@@ -148,6 +171,8 @@ class TestEndToEndWorkflow:
         except Exception as e:
             pytest.fail(f"训练工作流程测试失败: {str(e)}")
     
+    @pytest.mark.integration
+    @pytest.mark.requires_data
     def test_complete_backtest_workflow(self, test_env):
         """
         测试完整的回测工作流程 / Test complete backtest workflow
@@ -164,6 +189,11 @@ class TestEndToEndWorkflow:
         data_path = Path(config.qlib.provider_uri).expanduser()
         if not data_path.exists():
             pytest.skip(f"Qlib数据不可用: {data_path}")
+        
+        # 检查数据是否已解压
+        data_files = list(data_path.glob("*"))
+        if len(data_files) == 1 and data_files[0].suffix == ".zip":
+            pytest.skip(f"Qlib数据未解压: {data_path}")
         
         try:
             # 1. 初始化数据管理器
@@ -209,7 +239,13 @@ class TestEndToEndWorkflow:
                 experiment_name="test_backtest_experiment"
             )
             
-            train_result = training_manager.train_model(train_config)
+            try:
+                train_result = training_manager.train_model(train_config)
+            except Exception as e:
+                # 如果是数据不存在的错误，跳过测试
+                if "does not contain data" in str(e) or "No data retrieved" in str(e):
+                    pytest.skip(f"Qlib数据未正确配置或不完整: {str(e)}")
+                raise
             assert train_result is not None, "训练失败"
             
             # 4. 运行回测
@@ -254,6 +290,8 @@ class TestEndToEndWorkflow:
         except Exception as e:
             pytest.fail(f"回测工作流程测试失败: {str(e)}")
     
+    @pytest.mark.integration
+    @pytest.mark.requires_data
     def test_cache_performance(self, test_env):
         """
         测试缓存性能 / Test cache performance
@@ -265,13 +303,24 @@ class TestEndToEndWorkflow:
         if not data_path.exists():
             pytest.skip(f"Qlib数据不可用: {data_path}")
         
+        # 检查数据是否已解压
+        data_files = list(data_path.glob("*"))
+        if len(data_files) == 1 and data_files[0].suffix == ".zip":
+            pytest.skip(f"Qlib数据未解压: {data_path}")
+        
         try:
             # 初始化数据管理器（启用缓存）
             data_manager_cached = DataManager(enable_cache=True)
-            data_manager_cached.initialize(
-                data_path=str(data_path),
-                region=config.qlib.region
-            )
+            try:
+                data_manager_cached.initialize(
+                    data_path=str(data_path),
+                    region=config.qlib.region
+                )
+            except Exception as e:
+                # 如果是数据不存在的错误，跳过测试
+                if "does not contain data" in str(e) or "No data retrieved" in str(e):
+                    pytest.skip(f"Qlib数据未正确配置或不完整: {str(e)}")
+                raise
             
             # 第一次验证（无缓存）
             start_time = datetime.now()
@@ -363,6 +412,8 @@ class TestEndToEndWorkflow:
 class TestPerformanceOptimization:
     """性能优化测试"""
     
+    @pytest.mark.integration
+    @pytest.mark.requires_data
     def test_data_loading_performance(self):
         """
         测试数据加载性能 / Test data loading performance
@@ -376,16 +427,33 @@ class TestPerformanceOptimization:
         if not data_path.exists():
             pytest.skip(f"Qlib数据不可用: {data_path}")
         
+        # 检查数据是否已解压
+        data_files = list(data_path.glob("*"))
+        if len(data_files) == 1 and data_files[0].suffix == ".zip":
+            pytest.skip(f"Qlib数据未解压: {data_path}")
+        
         try:
             data_manager = DataManager(enable_cache=True)
-            data_manager.initialize(
-                data_path=str(data_path),
-                region=config.qlib.region
-            )
+            try:
+                data_manager.initialize(
+                    data_path=str(data_path),
+                    region=config.qlib.region
+                )
+            except Exception as e:
+                # 如果是数据不存在的错误，跳过测试
+                if "does not contain data" in str(e) or "No data retrieved" in str(e):
+                    pytest.skip(f"Qlib数据未正确配置或不完整: {str(e)}")
+                raise
             
             # 测试数据加载性能
             start_time = datetime.now()
-            data_info = data_manager.get_data_info()
+            try:
+                data_info = data_manager.get_data_info()
+            except Exception as e:
+                # 如果是数据问题，跳过测试
+                if "can't find a freq" in str(e) or "获取交易日历失败" in str(e):
+                    pytest.skip(f"Qlib数据未正确配置或不完整: {str(e)}")
+                raise
             load_time = (datetime.now() - start_time).total_seconds()
             
             assert data_info is not None, "数据信息为空"

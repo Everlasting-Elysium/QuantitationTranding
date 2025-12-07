@@ -1,0 +1,726 @@
+# Notification Configuration File / 通知配置文件
+# ============================================================================
+# 
+# 此文件定义了系统的通知服务配置，包括邮件、短信和系统通知
+# This file defines the notification service configuration, including email, SMS, and system notifications
+#
+# 配置说明 / Configuration Guide:
+# - email: 邮件通知配置
+# - sms: 短信通知配置
+# - system: 系统通知配置
+# - recipients: 通知接收人配置
+# - triggers: 通知触发条件
+# - templates: 通知内容模板
+#
+# 版本 / Version: 1.0
+# 最后更新 / Last Updated: 2024-12-07
+# ============================================================================
+
+# ============================================================================
+# 邮件通知配置 / Email Notification Configuration
+# ============================================================================
+email:
+  # 基本配置 / Basic Configuration
+  enabled: false  # 是否启用邮件通知 / Whether to enable email notification
+  
+  # SMTP服务器配置 / SMTP Server Configuration
+  smtp:
+    server: "smtp.example.com"  # SMTP服务器地址 / SMTP server address
+    port: 587  # SMTP服务器端口 / SMTP server port (587 for TLS, 465 for SSL, 25 for plain)
+    use_tls: true  # 是否使用TLS加密 / Whether to use TLS encryption
+    use_ssl: false  # 是否使用SSL加密 / Whether to use SSL encryption
+    timeout: 30  # 连接超时时间（秒）/ Connection timeout (seconds)
+  
+  # 认证信息 / Authentication
+  auth:
+    username: "your_email@example.com"  # 邮箱用户名 / Email username
+    password: "your_password_or_app_token"  # 邮箱密码或授权码 / Email password or authorization code
+  
+  # 发件人信息 / Sender Information
+  sender:
+    email: "your_email@example.com"  # 发件人邮箱地址 / Sender email address
+    name: "量化交易系统"  # 发件人名称 / Sender name
+    name_en: "Quant Trading System"
+  
+  # 邮件格式 / Email Format
+  format:
+    # 邮件内容类型 / Email content type
+    content_type: "html"  # html or plain
+    
+    # 字符编码 / Character encoding
+    charset: "utf-8"
+    
+    # 是否包含附件 / Include attachments
+    include_attachments: true
+    
+    # 附件类型 / Attachment types
+    attachment_types:
+      - "pdf"  # PDF报告
+      - "csv"  # CSV数据
+      - "xlsx"  # Excel表格
+  
+  # 重试配置 / Retry Configuration
+  retry:
+    # 是否启用重试 / Enable retry
+    enabled: true
+    
+    # 最大重试次数 / Max retry attempts
+    max_attempts: 3
+    
+    # 重试间隔（秒）/ Retry interval (seconds)
+    retry_interval: 60
+    
+    # 指数退避 / Exponential backoff
+    exponential_backoff: true
+  
+  # 速率限制 / Rate Limiting
+  rate_limit:
+    # 是否启用速率限制 / Enable rate limiting
+    enabled: true
+    
+    # 每小时最大发送数 / Max emails per hour
+    max_per_hour: 50
+    
+    # 每天最大发送数 / Max emails per day
+    max_per_day: 200
+  
+  # 邮件优先级 / Email Priority
+  priority:
+    # 默认优先级 / Default priority (1=highest, 3=normal, 5=lowest)
+    default: 3
+    
+    # 风险预警优先级 / Risk alert priority
+    risk_alert: 1
+    
+    # 日报优先级 / Daily report priority
+    daily_report: 3
+
+# ============================================================================
+# 短信通知配置 / SMS Notification Configuration
+# ============================================================================
+sms:
+  # 基本配置 / Basic Configuration
+  enabled: false  # 是否启用短信通知 / Whether to enable SMS notification
+  
+  # 短信服务商配置 / SMS Provider Configuration
+  provider:
+    name: "aliyun"  # 服务商名称 / Provider name (aliyun, tencent, twilio, etc.)
+    api_key: "your_sms_api_key"  # API密钥 / API key
+    api_secret: "your_sms_api_secret"  # API密钥 / API secret
+    api_url: "https://api.sms-provider.com/send"  # API地址 / API URL
+    region: "cn-hangzhou"  # 服务区域 / Service region
+  
+  # 短信签名 / SMS Signature
+  signature: "量化交易系统"  # 短信签名 / SMS signature
+  
+  # 短信模板 / SMS Templates
+  templates:
+    # 风险预警模板 / Risk alert template
+    risk_alert:
+      template_id: "SMS_123456789"
+      params:
+        - "alert_type"
+        - "severity"
+        - "message"
+    
+    # 交易通知模板 / Trading notification template
+    trading_notification:
+      template_id: "SMS_987654321"
+      params:
+        - "action"
+        - "symbol"
+        - "quantity"
+    
+    # 系统通知模板 / System notification template
+    system_notification:
+      template_id: "SMS_111222333"
+      params:
+        - "event"
+        - "message"
+  
+  # 重试配置 / Retry Configuration
+  retry:
+    enabled: true
+    max_attempts: 3
+    retry_interval: 30
+  
+  # 速率限制 / Rate Limiting
+  rate_limit:
+    enabled: true
+    max_per_hour: 20  # 每小时最大发送数
+    max_per_day: 50  # 每天最大发送数
+  
+  # 发送时间限制 / Send Time Restrictions
+  time_restrictions:
+    # 是否启用时间限制 / Enable time restrictions
+    enabled: true
+    
+    # 允许发送的时间段 / Allowed send time
+    allowed_hours:
+      start: "08:00"  # 开始时间
+      end: "22:00"  # 结束时间
+    
+    # 紧急通知可以突破时间限制 / Emergency notifications can bypass time restrictions
+    emergency_bypass: true
+
+# ============================================================================
+# 系统通知配置 / System Notification Configuration
+# ============================================================================
+system:
+  # 基本配置 / Basic Configuration
+  enabled: true  # 是否启用系统通知 / Whether to enable system notification
+  
+  # 通知方式 / Notification Methods
+  methods:
+    # 桌面通知 / Desktop notification
+    desktop:
+      enabled: true
+      duration: 5  # 显示时长（秒）/ Display duration (seconds)
+      sound: true  # 是否播放声音 / Play sound
+    
+    # 控制台输出 / Console output
+    console:
+      enabled: true
+      color: true  # 是否使用彩色输出 / Use colored output
+    
+    # 日志记录 / Logging
+    logging:
+      enabled: true
+      level: "INFO"  # 日志级别 / Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+      file: "logs/notifications.log"  # 日志文件 / Log file
+  
+  # 通知级别 / Notification Levels
+  levels:
+    info:
+      icon: "ℹ️"
+      color: "blue"
+      sound: false
+    
+    success:
+      icon: "✅"
+      color: "green"
+      sound: false
+    
+    warning:
+      icon: "⚠️"
+      color: "yellow"
+      sound: true
+    
+    error:
+      icon: "❌"
+      color: "red"
+      sound: true
+    
+    critical:
+      icon: "🔴"
+      color: "red"
+      sound: true
+
+# ============================================================================
+# 通知接收人配置 / Notification Recipients Configuration
+# ============================================================================
+recipients:
+  # 接收人组 / Recipient Groups
+  groups:
+    # 管理员组 / Admin group
+    admin:
+      name: "管理员"
+      name_en: "Administrators"
+      emails:
+        - "admin@example.com"
+      phone_numbers:
+        - "13800138000"
+      notification_types:
+        - "all"  # 接收所有类型的通知
+    
+    # 交易员组 / Trader group
+    traders:
+      name: "交易员"
+      name_en: "Traders"
+      emails:
+        - "trader1@example.com"
+        - "trader2@example.com"
+      phone_numbers:
+        - "13900139000"
+      notification_types:
+        - "daily_report"
+        - "weekly_report"
+        - "risk_alert"
+        - "trading_notification"
+    
+    # 风控组 / Risk management group
+    risk_managers:
+      name: "风控"
+      name_en: "Risk Managers"
+      emails:
+        - "risk@example.com"
+      phone_numbers:
+        - "13700137000"
+      notification_types:
+        - "risk_alert"
+        - "daily_report"
+    
+    # 开发组 / Developer group
+    developers:
+      name: "开发"
+      name_en: "Developers"
+      emails:
+        - "dev@example.com"
+      notification_types:
+        - "system_error"
+        - "system_warning"
+  
+  # 默认接收人 / Default recipients
+  default:
+    emails:
+      - "default@example.com"
+    phone_numbers:
+      - "13600136000"
+
+# ============================================================================
+# 通知触发条件 / Notification Trigger Conditions
+# ============================================================================
+triggers:
+  # 定时报告 / Scheduled Reports
+  scheduled_reports:
+    # 每日报告 / Daily Report
+    daily_report:
+      enabled: true
+      time: "18:00"  # 发送时间 / Send time (24-hour format)
+      recipients: ["traders", "risk_managers"]  # 接收人组 / Recipient groups
+      methods:
+        email: true
+        sms: false
+        system: true
+    
+    # 每周报告 / Weekly Report
+    weekly_report:
+      enabled: true
+      day: "Friday"  # 发送日期 / Send day (Monday-Sunday)
+      time: "18:00"
+      recipients: ["admin", "traders", "risk_managers"]
+      methods:
+        email: true
+        sms: false
+        system: true
+    
+    # 每月报告 / Monthly Report
+    monthly_report:
+      enabled: true
+      day: 1  # 每月第几天 / Day of month (1-31)
+      time: "18:00"
+      recipients: ["admin", "traders", "risk_managers"]
+      methods:
+        email: true
+        sms: false
+        system: true
+  
+  # 风险预警 / Risk Alerts
+  risk_alerts:
+    # 正常级别 / Normal level
+    normal:
+      enabled: false  # 正常情况不发送通知
+      recipients: []
+      methods:
+        email: false
+        sms: false
+        system: false
+    
+    # 注意级别 / Caution level
+    caution:
+      enabled: true
+      recipients: ["traders", "risk_managers"]
+      methods:
+        email: true
+        sms: false
+        system: true
+      # 通知频率限制 / Notification frequency limit
+      min_interval: 300  # 最小间隔（秒）/ Min interval (seconds)
+    
+    # 警告级别 / Warning level
+    warning:
+      enabled: true
+      recipients: ["admin", "traders", "risk_managers"]
+      methods:
+        email: true
+        sms: true
+        system: true
+      min_interval: 180  # 3分钟
+    
+    # 危险级别 / Danger level
+    danger:
+      enabled: true
+      recipients: ["admin", "traders", "risk_managers"]
+      methods:
+        email: true
+        sms: true
+        system: true
+      min_interval: 60  # 1分钟
+      # 紧急通知 / Emergency notification
+      emergency: true
+  
+  # 交易通知 / Trading Notifications
+  trading:
+    # 订单执行 / Order execution
+    order_executed:
+      enabled: true
+      recipients: ["traders"]
+      methods:
+        email: false
+        sms: false
+        system: true
+    
+    # 订单失败 / Order failed
+    order_failed:
+      enabled: true
+      recipients: ["traders", "risk_managers"]
+      methods:
+        email: true
+        sms: false
+        system: true
+    
+    # 止损触发 / Stop loss triggered
+    stop_loss_triggered:
+      enabled: true
+      recipients: ["traders", "risk_managers"]
+      methods:
+        email: true
+        sms: true
+        system: true
+    
+    # 大额交易 / Large trade
+    large_trade:
+      enabled: true
+      threshold: 100000  # 交易金额阈值（元）/ Trade amount threshold (CNY)
+      recipients: ["admin", "traders", "risk_managers"]
+      methods:
+        email: true
+        sms: false
+        system: true
+  
+  # 系统事件 / System Events
+  system:
+    # 系统启动 / System startup
+    startup:
+      enabled: true
+      recipients: ["admin", "developers"]
+      methods:
+        email: false
+        sms: false
+        system: true
+    
+    # 系统关闭 / System shutdown
+    shutdown:
+      enabled: true
+      recipients: ["admin", "developers"]
+      methods:
+        email: false
+        sms: false
+        system: true
+    
+    # 系统错误 / System error
+    error:
+      enabled: true
+      recipients: ["admin", "developers"]
+      methods:
+        email: true
+        sms: false
+        system: true
+    
+    # 系统警告 / System warning
+    warning:
+      enabled: true
+      recipients: ["developers"]
+      methods:
+        email: false
+        sms: false
+        system: true
+    
+    # 数据更新 / Data update
+    data_update:
+      enabled: true
+      recipients: ["developers"]
+      methods:
+        email: false
+        sms: false
+        system: true
+
+# ============================================================================
+# 通知内容模板 / Notification Content Templates
+# ============================================================================
+templates:
+  # 邮件主题模板 / Email Subject Templates
+  subjects:
+    # 每日报告 / Daily report
+    daily_report: "【量化交易】每日交易报告 - {date}"
+    daily_report_en: "[Quant Trading] Daily Trading Report - {date}"
+    
+    # 每周报告 / Weekly report
+    weekly_report: "【量化交易】每周交易报告 - {week}"
+    weekly_report_en: "[Quant Trading] Weekly Trading Report - {week}"
+    
+    # 每月报告 / Monthly report
+    monthly_report: "【量化交易】每月交易报告 - {month}"
+    monthly_report_en: "[Quant Trading] Monthly Trading Report - {month}"
+    
+    # 风险预警 / Risk alert
+    risk_alert: "【风险预警】{alert_level} - {alert_type}"
+    risk_alert_en: "[Risk Alert] {alert_level} - {alert_type}"
+    
+    # 交易通知 / Trading notification
+    trading_notification: "【交易通知】{action} {symbol}"
+    trading_notification_en: "[Trading] {action} {symbol}"
+    
+    # 系统通知 / System notification
+    system_notification: "【系统通知】{event}"
+    system_notification_en: "[System] {event}"
+  
+  # 邮件内容模板 / Email Content Templates
+  email_body:
+    # 每日报告模板 / Daily report template
+    daily_report: |
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body {{ font-family: Arial, sans-serif; line-height: 1.6; }}
+          .header {{ background-color: #4CAF50; color: white; padding: 20px; text-align: center; }}
+          .content {{ padding: 20px; }}
+          .metrics {{ background-color: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }}
+          .footer {{ background-color: #333; color: white; padding: 10px; text-align: center; font-size: 12px; }}
+          table {{ border-collapse: collapse; width: 100%; }}
+          th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+          th {{ background-color: #4CAF50; color: white; }}
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>每日交易报告 / Daily Trading Report</h1>
+          <p>{date}</p>
+        </div>
+        <div class="content">
+          <div class="metrics">
+            <h2>今日概况 / Today's Summary</h2>
+            <p>账户总值 / Total Value: ¥{total_value:,.2f}</p>
+            <p>今日收益 / Daily P&L: ¥{daily_pnl:+,.2f} ({daily_return:+.2%})</p>
+            <p>持仓数量 / Positions: {position_count}</p>
+            <p>现金比例 / Cash Ratio: {cash_ratio:.1%}</p>
+          </div>
+          
+          <div class="metrics">
+            <h2>风险指标 / Risk Metrics</h2>
+            <p>最大回撤 / Max Drawdown: {max_drawdown:.2%}</p>
+            <p>波动率 / Volatility: {volatility:.2%}</p>
+            <p>夏普比率 / Sharpe Ratio: {sharpe_ratio:.2f}</p>
+          </div>
+          
+          <h2>今日交易 / Today's Trades</h2>
+          <table>
+            <tr>
+              <th>时间 / Time</th>
+              <th>股票 / Symbol</th>
+              <th>操作 / Action</th>
+              <th>数量 / Quantity</th>
+              <th>价格 / Price</th>
+            </tr>
+            {trades_table}
+          </table>
+        </div>
+        <div class="footer">
+          <p>量化交易系统 / Quantitative Trading System</p>
+          <p>此邮件由系统自动发送，请勿回复 / This is an automated email, please do not reply</p>
+        </div>
+      </body>
+      </html>
+    
+    # 风险预警模板 / Risk alert template
+    risk_alert: |
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body {{ font-family: Arial, sans-serif; line-height: 1.6; }}
+          .header {{ background-color: #f44336; color: white; padding: 20px; text-align: center; }}
+          .content {{ padding: 20px; }}
+          .alert-box {{ background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin: 10px 0; }}
+          .critical {{ background-color: #f8d7da; border-left: 5px solid #dc3545; }}
+          .footer {{ background-color: #333; color: white; padding: 10px; text-align: center; font-size: 12px; }}
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>{alert_icon} 风险预警 / Risk Alert</h1>
+          <h2>{alert_level}</h2>
+        </div>
+        <div class="content">
+          <div class="alert-box {alert_class}">
+            <h2>预警信息 / Alert Information</h2>
+            <p><strong>预警类型 / Alert Type:</strong> {alert_type}</p>
+            <p><strong>预警级别 / Alert Level:</strong> {alert_level}</p>
+            <p><strong>触发时间 / Trigger Time:</strong> {trigger_time}</p>
+            <p><strong>描述 / Description:</strong> {description}</p>
+          </div>
+          
+          <h2>当前状态 / Current Status</h2>
+          <p>当日亏损 / Daily Loss: {daily_loss:.2%}</p>
+          <p>总亏损 / Total Loss: {total_loss:.2%}</p>
+          <p>最大回撤 / Max Drawdown: {max_drawdown:.2%}</p>
+          <p>波动率 / Volatility: {volatility:.2%}</p>
+          
+          <h2>建议措施 / Recommended Actions</h2>
+          <ul>
+            {recommended_actions}
+          </ul>
+        </div>
+        <div class="footer">
+          <p>量化交易系统 / Quantitative Trading System</p>
+          <p>请立即查看系统并采取必要措施 / Please check the system immediately and take necessary actions</p>
+        </div>
+      </body>
+      </html>
+  
+  # 短信内容模板 / SMS Content Templates
+  sms_body:
+    # 风险预警短信 / Risk alert SMS
+    risk_alert: "【量化交易】{alert_icon}{alert_level}预警：{alert_type}。当日亏损{daily_loss:.2%}，请立即查看系统。"
+    
+    # 交易通知短信 / Trading notification SMS
+    trading_notification: "【量化交易】{action} {symbol} {quantity}股，价格¥{price:.2f}。"
+    
+    # 止损触发短信 / Stop loss triggered SMS
+    stop_loss_triggered: "【量化交易】止损触发：{symbol}，亏损{loss:.2%}，已自动平仓。"
+
+# ============================================================================
+# 通知历史记录配置 / Notification History Configuration
+# ============================================================================
+history:
+  # 是否记录通知历史 / Record notification history
+  enabled: true
+  
+  # 历史记录保存路径 / History save path
+  save_path: "logs/notification_history"
+  
+  # 历史记录保留天数 / History retention days
+  retention_days: 90
+  
+  # 记录格式 / Record format
+  format: "json"  # json, csv, or database
+  
+  # 是否记录失败的通知 / Record failed notifications
+  record_failures: true
+
+# ============================================================================
+# 通知测试配置 / Notification Test Configuration
+# ============================================================================
+test:
+  # 测试模式 / Test mode
+  enabled: false  # 启用测试模式时，所有通知都不会真正发送
+  
+  # 测试接收人 / Test recipients
+  test_recipients:
+    emails:
+      - "test@example.com"
+    phone_numbers:
+      - "13500135000"
+  
+  # 是否在测试模式下记录日志 / Log in test mode
+  log_in_test_mode: true
+
+# ============================================================================
+# 默认配置 / Default Configuration
+# ============================================================================
+defaults:
+  # 默认语言 / Default language
+  language: "zh"  # zh or en
+  
+  # 默认时区 / Default timezone
+  timezone: "Asia/Shanghai"
+  
+  # 默认通知方式 / Default notification methods
+  methods:
+    email: true
+    sms: false
+    system: true
+  
+  # 默认接收人组 / Default recipient groups
+  recipient_groups: ["admin"]
+
+# ============================================================================
+# 备注 / Notes
+# ============================================================================
+# 1. 邮件和短信服务需要配置相应的服务商账号
+#    Email and SMS services require configuration of service provider accounts
+# 2. 建议先在测试模式下验证配置
+#    It's recommended to verify configuration in test mode first
+# 3. 注意保护敏感信息（密码、API密钥等）
+#    Protect sensitive information (passwords, API keys, etc.)
+# 4. 根据实际需求调整通知频率和接收人
+#    Adjust notification frequency and recipients according to actual needs
+
+
+# ============================================================================
+# 默认配置 / Default Configuration
+# ============================================================================
+defaults:
+  # 默认语言 / Default language
+  language: "zh"  # zh or en
+  
+  # 默认时区 / Default timezone
+  timezone: "Asia/Shanghai"
+  
+  # 默认通知方式 / Default notification methods
+  methods:
+    email: true
+    sms: false
+    system: true
+  
+  # 默认接收人组 / Default recipient groups
+  recipient_groups: ["admin"]
+
+# ============================================================================
+# 通知历史记录配置 / Notification History Configuration
+# ============================================================================
+history:
+  # 是否记录通知历史 / Record notification history
+  enabled: true
+  
+  # 历史记录保存路径 / History save path
+  save_path: "logs/notification_history"
+  
+  # 历史记录保留天数 / History retention days
+  retention_days: 90
+  
+  # 记录格式 / Record format
+  format: "json"  # json, csv, or database
+  
+  # 是否记录失败的通知 / Record failed notifications
+  record_failures: true
+
+# ============================================================================
+# 通知测试配置 / Notification Test Configuration
+# ============================================================================
+test:
+  # 测试模式 / Test mode
+  enabled: false  # 启用测试模式时，所有通知都不会真正发送
+  
+  # 测试接收人 / Test recipients
+  test_recipients:
+    emails:
+      - "test@example.com"
+    phone_numbers:
+      - "13500135000"
+  
+  # 是否在测试模式下记录日志 / Log in test mode
+  log_in_test_mode: true
+
+# ============================================================================
+# 备注 / Notes
+# ============================================================================
+# 1. 邮件和短信服务需要配置相应的服务商账号
+#    Email and SMS services require configuration of service provider accounts
+# 2. 建议先在测试模式下验证配置
+#    It's recommended to verify configuration in test mode first
+# 3. 注意保护敏感信息（密码、API密钥等）
+#    Protect sensitive information (passwords, API keys, etc.)
+# 4. 根据实际需求调整通知频率和接收人
+#    Adjust notification frequency and recipients according to actual needs

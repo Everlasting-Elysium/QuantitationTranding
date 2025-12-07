@@ -1,0 +1,323 @@
+# Notification Configuration File / 通知配置文件
+# ============================================================================
+# 
+# 此文件定义了系统的通知服务配置，包括邮件、短信和系统通知
+# This file defines the notification service configuration, including email, SMS, and system notifications
+#
+# 配置说明 / Configuration Guide:
+# - email: 邮件通知配置
+# - sms: 短信通知配置
+# - system: 系统通知配置
+# - recipients: 通知接收人配置
+# - triggers: 通知触发条件
+# - templates: 通知内容模板
+#
+# 版本 / Version: 1.0
+# 最后更新 / Last Updated: 2024-12-07
+# ============================================================================
+
+# ============================================================================
+# 邮件通知配置 / Email Notification Configuration
+# ============================================================================
+email:
+  # 基本配置 / Basic Configuration
+  enabled: false  # 是否启用邮件通知 / Whether to enable email notification
+  
+  # SMTP服务器配置 / SMTP Server Configuration
+  smtp:
+    server: "smtp.example.com"  # SMTP服务器地址 / SMTP server address
+    port: 587  # SMTP服务器端口 / SMTP server port (587 for TLS, 465 for SSL, 25 for plain)
+    use_tls: true  # 是否使用TLS加密 / Whether to use TLS encryption
+    use_ssl: false  # 是否使用SSL加密 / Whether to use SSL encryption
+    timeout: 30  # 连接超时时间（秒）/ Connection timeout (seconds)
+  
+  # 认证信息 / Authentication
+  auth:
+    username: "your_email@example.com"  # 邮箱用户名 / Email username
+    password: "your_password_or_app_token"  # 邮箱密码或授权码 / Email password or authorization code
+  
+  # 发件人信息 / Sender Information
+  sender:
+    email: "your_email@example.com"  # 发件人邮箱地址 / Sender email address
+    name: "量化交易系统"  # 发件人名称 / Sender name
+    name_en: "Quant Trading System"
+  
+  # 邮件格式 / Email Format
+  format:
+    # 邮件内容类型 / Email content type
+    content_type: "html"  # html or plain
+    
+    # 字符编码 / Character encoding
+    charset: "utf-8"
+    
+    # 是否包含附件 / Include attachments
+    include_attachments: true
+    
+    # 附件类型 / Attachment types
+    attachment_types:
+      - "pdf"  # PDF报告
+      - "csv"  # CSV数据
+      - "xlsx"  # Excel表格
+  
+  # 重试配置 / Retry Configuration
+  retry:
+    # 是否启用重试 / Enable retry
+    enabled: true
+    
+    # 最大重试次数 / Max retry attempts
+    max_attempts: 3
+    
+    # 重试间隔（秒）/ Retry interval (seconds)
+    retry_interval: 60
+    
+    # 指数退避 / Exponential backoff
+    exponential_backoff: true
+  
+  # 速率限制 / Rate Limiting
+  rate_limit:
+    # 是否启用速率限制 / Enable rate limiting
+    enabled: true
+    
+    # 每小时最大发送数 / Max emails per hour
+    max_per_hour: 50
+    
+    # 每天最大发送数 / Max emails per day
+    max_per_day: 200
+  
+  # 邮件优先级 / Email Priority
+  priority:
+    # 默认优先级 / Default priority (1=highest, 3=normal, 5=lowest)
+    default: 3
+    
+    # 风险预警优先级 / Risk alert priority
+    risk_alert: 1
+    
+    # 日报优先级 / Daily report priority
+    daily_report: 3
+
+# ============================================================================
+# 短信通知配置 / SMS Notification Configuration
+# ============================================================================
+sms:
+  # 基本配置 / Basic Configuration
+  enabled: false  # 是否启用短信通知 / Whether to enable SMS notification
+  
+  # 短信服务商配置 / SMS Provider Configuration
+  provider:
+    name: "aliyun"  # 服务商名称 / Provider name (aliyun, tencent, twilio, etc.)
+    api_key: "your_sms_api_key"  # API密钥 / API key
+    api_secret: "your_sms_api_secret"  # API密钥 / API secret
+    api_url: "https://api.sms-provider.com/send"  # API地址 / API URL
+    region: "cn-hangzhou"  # 服务区域 / Service region
+  
+  # 短信签名 / SMS Signature
+  signature: "量化交易系统"  # 短信签名 / SMS signature
+  
+  # 短信模板 / SMS Templates
+  templates:
+    # 风险预警模板 / Risk alert template
+    risk_alert:
+      template_id: "SMS_123456789"
+      params:
+        - "alert_type"
+        - "severity"
+        - "message"
+    
+    # 交易通知模板 / Trading notification template
+    trading_notification:
+      template_id: "SMS_987654321"
+      params:
+        - "action"
+        - "symbol"
+        - "quantity"
+    
+    # 系统通知模板 / System notification template
+    system_notification:
+      template_id: "SMS_111222333"
+      params:
+        - "event"
+        - "message"
+  
+  # 重试配置 / Retry Configuration
+  retry:
+    enabled: true
+    max_attempts: 3
+    retry_interval: 30
+  
+  # 速率限制 / Rate Limiting
+  rate_limit:
+    enabled: true
+    max_per_hour: 20  # 每小时最大发送数
+    max_per_day: 50  # 每天最大发送数
+  
+  # 发送时间限制 / Send Time Restrictions
+  time_restrictions:
+    # 是否启用时间限制 / Enable time restrictions
+    enabled: true
+    
+    # 允许发送的时间段 / Allowed send time
+    allowed_hours:
+      start: "08:00"  # 开始时间
+      end: "22:00"  # 结束时间
+    
+    # 紧急通知可以突破时间限制 / Emergency notifications can bypass time restrictions
+    emergency_bypass: true
+
+# ============================================================================
+# 系统通知配置 / System Notification Configuration
+# ============================================================================
+system:
+  # 基本配置 / Basic Configuration
+  enabled: true  # 是否启用系统通知 / Whether to enable system notification
+  
+  # 通知方式 / Notification Methods
+  methods:
+    # 桌面通知 / Desktop notification
+    desktop:
+      enabled: true
+      duration: 5  # 显示时长（秒）/ Display duration (seconds)
+      sound: true  # 是否播放声音 / Play sound
+    
+    # 控制台输出 / Console output
+    console:
+      enabled: true
+      color: true  # 是否使用彩色输出 / Use colored output
+    
+    # 日志记录 / Logging
+    logging:
+      enabled: true
+      level: "INFO"  # 日志级别 / Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+      file: "logs/notifications.log"  # 日志文件 / Log file
+  
+  # 通知级别 / Notification Levels
+  levels:
+    info:
+      icon: "ℹ️"
+      color: "blue"
+      sound: false
+    
+    success:
+      icon: "✅"
+      color: "green"
+      sound: false
+    
+    warning:
+      icon: "⚠️"
+      color: "yellow"
+      sound: true
+    
+    error:
+      icon: "❌"
+      color: "red"
+      sound: true
+    
+    critical:
+      icon: "🔴"
+      color: "red"
+      sound: true
+
+# ============================================================================
+# 通知接收人配置 / Notification Recipients Configuration
+# ============================================================================
+recipients:
+  # 接收人组 / Recipient Groups
+  groups:
+    # 管理员组 / Admin group
+    admin:
+      name: "管理员"
+      name_en: "Administrators"
+      emails:
+        - "admin@example.com"
+      phone_numbers:
+        - "13800138000"
+      notification_types:
+        - "all"  # 接收所有类型的通知
+    
+    # 交易员组 / Trader group
+    traders:
+      name: "交易员"
+      name_en: "Traders"
+      emails:
+        - "trader1@example.com"
+        - "trader2@example.com"
+      phone_numbers:
+        - "13900139000"
+      notification_types:
+        - "daily_report"
+        - "weekly_report"
+        - "risk_alert"
+        - "trading_notification"
+    
+    # 风控组 / Risk management group
+    risk_managers:
+      name: "风控"
+      name_en: "Risk Managers"
+      emails:
+        - "risk@example.com"
+      phone_numbers:
+        - "13700137000"
+      notification_types:
+        - "risk_alert"
+        - "daily_report"
+    
+    # 开发组 / Developer group
+    developers:
+      name: "开发"
+      name_en: "Developers"
+      emails:
+        - "dev@example.com"
+      notification_types:
+        - "system_error"
+        - "system_warning"
+  
+  # 默认接收人 / Default recipients
+  default:
+    emails:
+      - "default@example.com"
+    phone_numbers:
+      - "13600136000"
+
+# 通知触发条件 / Notification Trigger Conditions
+triggers:
+  # 每日报告 / Daily Report
+  daily_report:
+    enabled: true
+    time: "18:00"  # 发送时间 / Send time (24-hour format)
+  
+  # 每周报告 / Weekly Report
+  weekly_report:
+    enabled: true
+    day: "Friday"  # 发送日期 / Send day
+    time: "18:00"
+  
+  # 每月报告 / Monthly Report
+  monthly_report:
+    enabled: true
+    day: 1  # 每月第几天 / Day of month
+    time: "18:00"
+  
+  # 风险预警 / Risk Alert
+  risk_alert:
+    enabled: true
+    # 预警级别 / Alert levels
+    levels:
+      - "warning"   # 警告 / Warning
+      - "critical"  # 严重 / Critical
+    # 通知方式 / Notification methods
+    methods:
+      email: true
+      sms: true  # 严重预警建议启用短信 / SMS recommended for critical alerts
+
+# 通知内容模板 / Notification Content Templates
+templates:
+  # 每日报告主题 / Daily report subject
+  daily_report_subject: "【量化交易】每日交易报告 - {date}"
+  
+  # 每周报告主题 / Weekly report subject
+  weekly_report_subject: "【量化交易】每周交易报告 - {week}"
+  
+  # 每月报告主题 / Monthly report subject
+  monthly_report_subject: "【量化交易】每月交易报告 - {month}"
+  
+  # 风险预警主题 / Risk alert subject
+  risk_alert_subject: "【风险预警】{alert_type} - {severity}"
