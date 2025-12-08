@@ -37,6 +37,10 @@ class MainCLI:
         self._mlflow_tracker = None
         self._config_manager = None
         
+        # 内存监控器引用（由main函数启动）
+        # Memory monitor reference (started by main function)
+        self._memory_monitor = None
+        
         # Menu options and their handlers
         # 菜单选项及其处理器
         self.menu_options: Dict[str, Dict[str, any]] = {
@@ -75,6 +79,11 @@ class MainCLI:
                 "name": "报告查看 / View Reports",
                 "handler": self._handle_reports,
                 "description": "查看训练和回测报告 / View training and backtest reports"
+            },
+            "7": {
+                "name": "🔧 系统管理 / System Management",
+                "handler": self._handle_system_management,
+                "description": "内存监控、缓存清理等系统管理功能 / Memory monitoring, cache cleanup, etc."
             },
             "h": {
                 "name": "帮助 / Help",
@@ -2763,13 +2772,242 @@ class MainCLI:
             print(f"\n❌ 导出失败 / Export failed: {str(e)}")
 
 
+    def _handle_system_management(self) -> None:
+        """
+        Handle system management menu.
+        处理系统管理菜单。
+        """
+        while True:
+            print("\n" + "="*60)
+            print("系统管理 / System Management")
+            print("="*60)
+            
+            print("\n1. 查看内存状态 / View Memory Status")
+            print("2. 清理缓存 / Clear Cache")
+            print("3. 强制垃圾回收 / Force Garbage Collection")
+            print("4. 查看缓存统计 / View Cache Statistics")
+            print("5. 内存监控设置 / Memory Monitor Settings")
+            print("0. 返回主菜单 / Back to Main Menu")
+            
+            choice = self.prompt.ask_text(
+                "\n请选择操作 / Please select an option",
+                default="0"
+            )
+            
+            if choice == "0":
+                break
+            elif choice == "1":
+                self._show_memory_status()
+            elif choice == "2":
+                self._clear_cache()
+            elif choice == "3":
+                self._force_gc()
+            elif choice == "4":
+                self._show_cache_stats()
+            elif choice == "5":
+                self._memory_monitor_settings()
+            else:
+                print("\n❌ 无效选择 / Invalid choice")
+    
+    def _show_memory_status(self) -> None:
+        """显示内存状态 / Show memory status"""
+        try:
+            from ..utils.memory_monitor import get_memory_monitor
+            
+            monitor = get_memory_monitor()
+            stats = monitor.get_memory_stats()
+            
+            print("\n" + "="*60)
+            print("内存状态 / Memory Status")
+            print("="*60)
+            print(f"\n物理内存使用 / Physical Memory (RSS): {stats.rss_mb:.2f} MB")
+            print(f"虚拟内存使用 / Virtual Memory (VMS): {stats.vms_mb:.2f} MB")
+            print(f"内存占比 / Memory Percentage: {stats.percent:.2f}%")
+            print(f"系统可用内存 / Available Memory: {stats.available_mb:.2f} MB")
+            
+            # 检查内存状态
+            is_ok, message = monitor.check_memory()
+            if is_ok:
+                print(f"\n✅ {message}")
+            else:
+                print(f"\n⚠️ {message}")
+            
+        except Exception as e:
+            print(f"\n❌ 获取内存状态失败 / Failed to get memory status: {str(e)}")
+        
+        input("\n按Enter键继续... / Press Enter to continue...")
+    
+    def _clear_cache(self) -> None:
+        """清理缓存 / Clear cache"""
+        try:
+            from ..utils.cache_manager import get_cache_manager
+            
+            confirm = self.prompt.confirm(
+                "确定要清理所有缓存吗？这将删除所有缓存数据。\n"
+                "Are you sure you want to clear all cache? This will delete all cached data.",
+                default=False
+            )
+            
+            if not confirm:
+                print("\n已取消 / Cancelled")
+                return
+            
+            print("\n正在清理缓存... / Clearing cache...")
+            cache_manager = get_cache_manager()
+            count = cache_manager.clear()
+            
+            print(f"\n✅ 已清理 {count} 个缓存条目 / Cleared {count} cache entries")
+            
+        except Exception as e:
+            print(f"\n❌ 清理缓存失败 / Failed to clear cache: {str(e)}")
+        
+        input("\n按Enter键继续... / Press Enter to continue...")
+    
+    def _force_gc(self) -> None:
+        """强制垃圾回收 / Force garbage collection"""
+        try:
+            import gc
+            from ..utils.memory_monitor import get_memory_monitor
+            
+            monitor = get_memory_monitor()
+            before_stats = monitor.get_memory_stats()
+            
+            print("\n正在执行垃圾回收... / Running garbage collection...")
+            collected = gc.collect()
+            
+            after_stats = monitor.get_memory_stats()
+            freed_mb = before_stats.rss_mb - after_stats.rss_mb
+            
+            print(f"\n✅ 垃圾回收完成 / Garbage collection completed")
+            print(f"回收对象数 / Objects collected: {collected}")
+            print(f"释放内存 / Memory freed: {freed_mb:.2f} MB")
+            print(f"当前内存使用 / Current memory usage: {after_stats.rss_mb:.2f} MB")
+            
+        except Exception as e:
+            print(f"\n❌ 垃圾回收失败 / Failed to run GC: {str(e)}")
+        
+        input("\n按Enter键继续... / Press Enter to continue...")
+    
+    def _show_cache_stats(self) -> None:
+        """显示缓存统计 / Show cache statistics"""
+        try:
+            from ..utils.cache_manager import get_cache_manager
+            
+            cache_manager = get_cache_manager()
+            stats = cache_manager.get_cache_stats()
+            
+            print("\n" + "="*60)
+            print("缓存统计 / Cache Statistics")
+            print("="*60)
+            print(f"\n内存缓存数量 / Memory cache count: {stats['memory_cache_count']}")
+            print(f"磁盘缓存数量 / Disk cache count: {stats['disk_cache_count']}")
+            print(f"缓存总大小 / Total cache size: {stats['total_cache_size_mb']:.2f} MB")
+            print(f"缓存目录 / Cache directory: {stats['cache_directory']}")
+            
+        except Exception as e:
+            print(f"\n❌ 获取缓存统计失败 / Failed to get cache stats: {str(e)}")
+        
+        input("\n按Enter键继续... / Press Enter to continue...")
+    
+    def _memory_monitor_settings(self) -> None:
+        """内存监控设置 / Memory monitor settings"""
+        try:
+            from ..utils.memory_monitor import get_memory_monitor
+            
+            monitor = get_memory_monitor()
+            
+            print("\n" + "="*60)
+            print("内存监控设置 / Memory Monitor Settings")
+            print("="*60)
+            
+            print("\n当前设置 / Current Settings:")
+            print(f"最大内存限制 / Max memory: {monitor._max_memory_mb} MB")
+            print(f"警告阈值 / Warning threshold: {monitor._warning_threshold * 100}%")
+            print(f"紧急阈值 / Critical threshold: {monitor._critical_threshold * 100}%")
+            print(f"检查间隔 / Check interval: {monitor._check_interval} 秒 / seconds")
+            print(f"自动清理 / Auto cleanup: {'启用 / Enabled' if monitor._auto_cleanup else '禁用 / Disabled'}")
+            
+            print("\n操作 / Actions:")
+            print("1. 立即执行清理 / Run cleanup now")
+            print("2. 立即执行紧急清理 / Run emergency cleanup now")
+            print("0. 返回 / Back")
+            
+            choice = self.prompt.ask_text(
+                "\n请选择操作 / Please select an option",
+                default="0"
+            )
+            
+            if choice == "1":
+                print("\n正在执行清理... / Running cleanup...")
+                monitor.force_cleanup()
+                print("✅ 清理完成 / Cleanup completed")
+            elif choice == "2":
+                confirm = self.prompt.confirm(
+                    "紧急清理将清除所有缓存并执行多次垃圾回收，确定继续吗？\n"
+                    "Emergency cleanup will clear all cache and run multiple GC cycles. Continue?",
+                    default=False
+                )
+                if confirm:
+                    print("\n正在执行紧急清理... / Running emergency cleanup...")
+                    monitor.force_emergency_cleanup()
+                    print("✅ 紧急清理完成 / Emergency cleanup completed")
+            
+        except Exception as e:
+            print(f"\n❌ 内存监控设置失败 / Failed to access memory monitor settings: {str(e)}")
+        
+        input("\n按Enter键继续... / Press Enter to continue...")
+
+
 def main():
     """
     Main entry point for the CLI application.
     CLI应用程序的主入口点。
     """
-    cli = MainCLI()
-    cli.run()
+    # 导入内存监控器
+    # Import memory monitor
+    try:
+        from ..utils.memory_monitor import get_memory_monitor
+        from ..infrastructure.logger_system import get_logger
+        
+        logger = get_logger(__name__)
+        
+        # 启动内存监控
+        # Start memory monitoring
+        logger.info("启动内存监控... / Starting memory monitoring...")
+        monitor = get_memory_monitor(
+            max_memory_mb=4096,  # 4GB限制 / 4GB limit
+            warning_threshold=0.8,  # 80%警告 / 80% warning
+            critical_threshold=0.9,  # 90%紧急 / 90% critical
+            check_interval=60,  # 每60秒检查 / Check every 60 seconds
+            auto_cleanup=True  # 自动清理 / Auto cleanup
+        )
+        monitor.start_monitoring()
+        logger.info("内存监控已启动 / Memory monitoring started")
+        
+        # 运行主程序
+        # Run main program
+        try:
+            cli = MainCLI()
+            cli.run()
+        finally:
+            # 停止内存监控
+            # Stop memory monitoring
+            logger.info("停止内存监控... / Stopping memory monitoring...")
+            monitor.stop_monitoring()
+            logger.info("内存监控已停止 / Memory monitoring stopped")
+            
+    except ImportError as e:
+        # 如果内存监控模块不可用，继续运行但不启用监控
+        # If memory monitor module is not available, continue without monitoring
+        print(f"⚠️ 内存监控模块不可用，继续运行... / Memory monitor not available, continuing...")
+        print(f"   错误 / Error: {str(e)}")
+        cli = MainCLI()
+        cli.run()
+    except Exception as e:
+        print(f"❌ 启动失败 / Startup failed: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 
 if __name__ == "__main__":

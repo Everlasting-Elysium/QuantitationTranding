@@ -87,7 +87,8 @@ class DataManager:
         self._logger = get_logger(__name__)
         self._initialized = False
         self._enable_cache = enable_cache
-        self._cache_manager = get_cache_manager() if enable_cache else None
+        # 限制内存缓存大小为50个条目，避免内存泄漏
+        self._cache_manager = get_cache_manager(max_memory_items=50) if enable_cache else None
     
     def initialize(
         self,
@@ -603,3 +604,13 @@ class DataManager:
     def qlib_wrapper(self) -> QlibWrapper:
         """获取QlibWrapper实例"""
         return self._qlib_wrapper
+    
+    def clear_cache(self) -> None:
+        """
+        清理缓存以释放内存 / Clear cache to free memory
+        """
+        if self._cache_manager:
+            count = self._cache_manager.clear()
+            self._logger.info(f"已清理 {count} 个缓存条目")
+        else:
+            self._logger.warning("缓存未启用，无需清理")

@@ -26,21 +26,23 @@ class CacheManager:
     - 提供缓存装饰器 / Provide cache decorators
     """
     
-    def __init__(self, cache_dir: str = ".cache", default_ttl: int = 3600):
+    def __init__(self, cache_dir: str = ".cache", default_ttl: int = 3600, max_memory_items: int = 100):
         """
         初始化缓存管理器 / Initialize cache manager
         
         Args:
             cache_dir: 缓存目录 / Cache directory
             default_ttl: 默认缓存过期时间（秒） / Default cache TTL in seconds
+            max_memory_items: 内存缓存最大条目数 / Maximum memory cache items
         """
         self._cache_dir = Path(cache_dir).expanduser()
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._default_ttl = default_ttl
+        self._max_memory_items = max_memory_items
         self._logger = get_logger(__name__)
         self._memory_cache: Dict[str, tuple] = {}  # key -> (value, expire_time)
         
-        self._logger.info(f"缓存管理器初始化 - 缓存目录: {self._cache_dir}, 默认TTL: {default_ttl}秒")
+        self._logger.info(f"缓存管理器初始化 - 缓存目录: {self._cache_dir}, 默认TTL: {default_ttl}秒, 最大内存条目: {max_memory_items}")
     
     def _generate_cache_key(self, *args, **kwargs) -> str:
         """
@@ -164,14 +166,33 @@ class CacheManager:
                     'created_time': datetime.now().isoformat()
                 }, f)
             
-            # 保存到内存
+            # 保存到内存前检查大小限制
             if use_memory:
+                # 清理过期的内存缓存
+                self._cleanup_expired_memory_cache()
+                
+                # 如果超过限制，删除最旧的条目
+                if len(self._memory_cache) >= self._max_memory_items:
+                    # 删除最旧的条目（FIFO策略）
+                    oldest_key = next(iter(self._memory_cache))
+                    del self._memory_cache[oldest_key]
+                    self._logger.debug(f"内存缓存已满，删除最旧条目: {oldest_key}")
+                
                 self._memory_cache[key] = (value, expire_time)
             
             self._logger.debug(f"缓存已设置: {key}, TTL: {ttl}秒")
             
         except Exception as e:
             self._logger.warning(f"设置缓存失败: {key}, 错误: {str(e)}")
+    
+    def _cleanup_expired_memory_cache(self) -> None:
+        """清理过期的内存缓存 / Clean up expired memory cache"""
+        now = datetime.now()
+        expired_keys = [k for k, (_, expire_time) in self._memory_cache.items() if now >= expire_time]
+        for key in expired_keys:
+            del self._memory_cache[key]
+        if expired_keys:
+            self._logger.debug(f"清理了 {len(expired_keys)} 个过期的内存缓存条目")
     
     def delete(self, key: str) -> None:
         """
@@ -298,7 +319,8 @@ _global_cache_manager: Optional[CacheManager] = None
 
 def get_cache_manager(
     cache_dir: str = ".cache",
-    default_ttl: int = 3600
+    default_ttl: int = 3600,
+    max_memory_items: int = 100
 ) -> CacheManager:
     """
     获取全局缓存管理器实例 / Get global cache manager instance
@@ -306,11 +328,16 @@ def get_cache_manager(
     Args:
         cache_dir: 缓存目录 / Cache directory
         default_ttl: 默认TTL / Default TTL
+        max_memory_items: 内存缓存最大条目数 / Maximum memory cache items
         
     Returns:
         CacheManager: 缓存管理器实例 / Cache manager instance
     """
     global _global_cache_manager
     if _global_cache_manager is None:
-        _global_cache_manager = CacheManager(cache_dir=cache_dir, default_ttl=default_ttl)
+        _global_cache_manager = CacheManager(
+            cache_dir=cache_dir, 
+            default_ttl=default_ttl,
+            max_memory_items=max_memory_items
+        )
     return _global_cache_manager

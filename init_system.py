@@ -386,13 +386,19 @@ class SystemInitializer:
             # 创建简单的验证脚本 / Create simple validation script
             validation_code = """
 import sys
-sys.path.insert(0, 'src')
+import os
+from pathlib import Path
+
+# 添加项目根目录和src目录到Python路径
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(project_root / 'src'))
 
 try:
     # 测试导入核心模块 / Test importing core modules
-    from infrastructure.qlib_wrapper import QlibWrapper
-    from core.config_manager import ConfigManager
-    from core.data_manager import DataManager
+    from src.infrastructure.qlib_wrapper import QlibWrapper
+    from src.core.config_manager import ConfigManager
+    from src.core.data_manager import DataManager
     
     print("✓ 核心模块导入成功 / Core modules imported successfully")
     

@@ -510,7 +510,7 @@ class QlibWrapper:
             # 获取交易日历
             calendar = self.get_calendar()
             
-            if not calendar:
+            if calendar is None or len(calendar) == 0:
                 error_info = ErrorInfo(
                     error_code="DAT0006",
                     error_message_zh="无法获取交易日历",

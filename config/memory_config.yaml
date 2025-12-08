@@ -1,0 +1,85 @@
+# 内存配置 / Memory Configuration
+# 用于控制系统内存使用，防止内存泄漏
+# Used to control system memory usage and prevent memory leaks
+
+# 缓存配置 / Cache Configuration
+cache:
+  # 是否启用缓存 / Enable cache
+  enabled: true
+  
+  # 缓存目录 / Cache directory
+  cache_dir: ".cache"
+  
+  # 默认缓存过期时间（秒） / Default cache TTL in seconds
+  default_ttl: 3600  # 1小时 / 1 hour
+  
+  # 内存缓存最大条目数 / Maximum memory cache items
+  # 降低此值可以减少内存使用
+  # Lowering this value reduces memory usage
+  max_memory_items: 50  # 从100降低到50 / Reduced from 100 to 50
+  
+  # 是否自动清理过期缓存 / Auto cleanup expired cache
+  auto_cleanup: true
+  
+  # 自动清理间隔（秒） / Auto cleanup interval in seconds
+  cleanup_interval: 600  # 10分钟 / 10 minutes
+
+# 数据加载配置 / Data Loading Configuration
+data_loading:
+  # 是否启用数据缓存 / Enable data caching
+  enable_cache: true
+  
+  # 批量加载大小 / Batch loading size
+  # 降低此值可以减少单次加载的内存占用
+  # Lowering this value reduces memory usage per load
+  batch_size: 100  # 每次最多加载100只股票的数据
+  
+  # 是否在加载后立即释放原始数据 / Release raw data after loading
+  release_after_load: true
+  
+  # 数据加载超时（秒） / Data loading timeout in seconds
+  timeout: 300  # 5分钟
+
+# 垃圾回收配置 / Garbage Collection Configuration
+garbage_collection:
+  # 是否启用自动垃圾回收 / Enable auto garbage collection
+  enabled: true
+  
+  # 垃圾回收阈值（MB） / GC threshold in MB
+  # 当内存使用超过此值时触发垃圾回收
+  # Trigger GC when memory usage exceeds this value
+  threshold_mb: 1024  # 1GB
+  
+  # 垃圾回收间隔（秒） / GC interval in seconds
+  interval: 300  # 5分钟
+
+# 内存限制 / Memory Limits
+memory_limits:
+  # 最大内存使用（MB） / Maximum memory usage in MB
+  # 当超过此值时，系统会尝试清理缓存和执行垃圾回收
+  # When exceeded, system will try to clean cache and run GC
+  max_memory_mb: 4096  # 4GB
+  
+  # 内存警告阈值（%） / Memory warning threshold (%)
+  # 当内存使用超过此百分比时发出警告
+  # Warn when memory usage exceeds this percentage
+  warning_threshold_percent: 80  # 80%
+  
+  # 内存紧急阈值（%） / Memory critical threshold (%)
+  # 当内存使用超过此百分比时采取紧急措施
+  # Take emergency actions when memory usage exceeds this percentage
+  critical_threshold_percent: 90  # 90%
+
+# 监控配置 / Monitoring Configuration
+monitoring:
+  # 是否启用内存监控 / Enable memory monitoring
+  enabled: true
+  
+  # 监控间隔（秒） / Monitoring interval in seconds
+  interval: 60  # 1分钟
+  
+  # 是否记录内存使用日志 / Log memory usage
+  log_usage: true
+  
+  # 日志级别 / Log level
+  log_level: "INFO"
