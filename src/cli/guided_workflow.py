@@ -15,6 +15,8 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 
 from .interactive_prompt import InteractivePrompt
+from ..application.performance_analyzer import PerformanceAnalyzer
+from ..infrastructure.qlib_wrapper import QlibWrapper
 
 
 @dataclass
@@ -294,23 +296,76 @@ class GuidedWorkflow:
             "info"
         )
         
-        # Simulate analysis progress / 模拟分析进度
-        for i in range(1, 6):
-            self.prompt.display_progress(i, 5, "分析中... / Analyzing...")
-            import time
-            time.sleep(0.3)
+        # 使用真实的性能分析器 / Use real performance analyzer
+        recommendations = []
+        try:
+            # 初始化qlib和性能分析器 / Initialize qlib and performance analyzer
+            qlib_wrapper = QlibWrapper()
+            data_path = Path.home() / ".qlib" / "qlib_data" / "cn_data"
+            
+            if not data_path.exists():
+                raise FileNotFoundError(f"数据路径不存在 / Data path not found: {data_path}")
+            
+            qlib_wrapper.init(provider_uri=str(data_path), region="cn")
+            analyzer = PerformanceAnalyzer(qlib_wrapper)
+            
+            # 显示分析进度 / Show analysis progress
+            self.prompt.display_message("正在加载数据... / Loading data...", "info")
+            
+            # 确定股票池 / Determine instrument pool
+            instruments = "csi300"  # 默认使用沪深300
+            if self.state.market == "CN" and self.state.asset_type == "stock":
+                instruments = "csi300"
+            
+            # 分析历史表现 / Analyze historical performance
+            self.prompt.display_message(
+                f"正在分析 {instruments} 股票池的历史表现...\n"
+                f"Analyzing historical performance of {instruments}...",
+                "info"
+            )
+            
+            report = analyzer.analyze_historical_performance(
+                market=self.state.market or "CN",
+                asset_type=self.state.asset_type or "stock",
+                lookback_years=3,
+                instruments=instruments
+            )
+            
+            # 转换推荐格式 / Convert recommendation format
+            for asset in report.top_performers[:10]:
+                recommendations.append({
+                    "symbol": asset.symbol,
+                    "name": asset.name or asset.symbol,
+                    "annual_return": asset.annual_return * 100,  # 转换为百分比
+                    "sharpe_ratio": asset.sharpe_ratio,
+                    "max_drawdown": asset.max_drawdown * 100
+                })
+            
+            self.prompt.display_message(
+                f"✓ 成功分析 {report.total_assets_analyzed} 只股票\n"
+                f"✓ Successfully analyzed {report.total_assets_analyzed} assets",
+                "success"
+            )
+            
+        except Exception as e:
+            # 如果分析失败，使用模拟数据作为后备 / Use mock data as fallback if analysis fails
+            self.prompt.display_message(
+                f"⚠️  无法分析真实数据，使用模拟推荐\n"
+                f"⚠️  Cannot analyze real data, using mock recommendations\n"
+                f"原因 / Reason: {str(e)}",
+                "warning"
+            )
+            
+            # 后备的模拟推荐 / Fallback mock recommendations
+            recommendations = [
+                {"symbol": "600519", "name": "贵州茅台", "annual_return": 25.0, "sharpe_ratio": 1.8, "max_drawdown": -15.0},
+                {"symbol": "300750", "name": "宁德时代", "annual_return": 35.0, "sharpe_ratio": 1.5, "max_drawdown": -20.0},
+                {"symbol": "002594", "name": "比亚迪", "annual_return": 40.0, "sharpe_ratio": 1.3, "max_drawdown": -25.0},
+                {"symbol": "000858", "name": "五粮液", "annual_return": 22.0, "sharpe_ratio": 1.6, "max_drawdown": -18.0},
+                {"symbol": "601318", "name": "中国平安", "annual_return": 18.0, "sharpe_ratio": 1.4, "max_drawdown": -22.0},
+            ]
         
-        # Mock recommendations (in real implementation, call PerformanceAnalyzer)
-        # 模拟推荐（实际实现中调用PerformanceAnalyzer）
-        mock_recommendations = [
-            {"symbol": "600519", "name": "贵州茅台", "annual_return": 25.0, "sharpe_ratio": 1.8, "max_drawdown": -15.0},
-            {"symbol": "300750", "name": "宁德时代", "annual_return": 35.0, "sharpe_ratio": 1.5, "max_drawdown": -20.0},
-            {"symbol": "002594", "name": "比亚迪", "annual_return": 40.0, "sharpe_ratio": 1.3, "max_drawdown": -25.0},
-            {"symbol": "000858", "name": "五粮液", "annual_return": 22.0, "sharpe_ratio": 1.6, "max_drawdown": -18.0},
-            {"symbol": "601318", "name": "中国平安", "annual_return": 18.0, "sharpe_ratio": 1.4, "max_drawdown": -22.0},
-        ]
-        
-        self.state.recommended_assets = mock_recommendations
+        self.state.recommended_assets = recommendations
         
         # Display recommendations / 显示推荐
         print("\n" + "="*80)
@@ -318,11 +373,11 @@ class GuidedWorkflow:
         print("Based on historical performance, we recommend the following quality assets:")
         print("="*80)
         
-        for i, asset in enumerate(mock_recommendations, 1):
+        for i, asset in enumerate(recommendations, 1):
             print(f"\n{i}. {asset['name']} ({asset['symbol']})")
-            print(f"   年化收益 / Annual Return: {asset['annual_return']}%")
-            print(f"   夏普比率 / Sharpe Ratio: {asset['sharpe_ratio']}")
-            print(f"   最大回撤 / Max Drawdown: {asset['max_drawdown']}%")
+            print(f"   年化收益 / Annual Return: {asset['annual_return']:.2f}%")
+            print(f"   夏普比率 / Sharpe Ratio: {asset['sharpe_ratio']:.2f}")
+            print(f"   最大回撤 / Max Drawdown: {asset['max_drawdown']:.2f}%")
         
         print("\n" + "="*80)
         
@@ -337,15 +392,15 @@ class GuidedWorkflow:
         try:
             selected_indices = [int(x.strip()) - 1 for x in selection_input.split(",")]
             self.state.selected_assets = [
-                mock_recommendations[i]["symbol"] 
+                recommendations[i]["symbol"] 
                 for i in selected_indices 
-                if 0 <= i < len(mock_recommendations)
+                if 0 <= i < len(recommendations)
             ]
             
             selected_names = [
-                mock_recommendations[i]["name"] 
+                recommendations[i]["name"] 
                 for i in selected_indices 
-                if 0 <= i < len(mock_recommendations)
+                if 0 <= i < len(recommendations)
             ]
             
             self.prompt.display_message(
@@ -355,7 +410,7 @@ class GuidedWorkflow:
             )
         except (ValueError, IndexError) as e:
             self.prompt.display_message(f"选择格式错误，使用默认选择 / Invalid format, using default", "warning")
-            self.state.selected_assets = [asset["symbol"] for asset in mock_recommendations[:3]]
+            self.state.selected_assets = [asset["symbol"] for asset in recommendations[:3]]
     
     def _step_target_setting(self) -> None:
         """

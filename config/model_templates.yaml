@@ -49,7 +49,7 @@ templates:
       min_data_in_leaf: 20
       lambda_l1: 0.0
       lambda_l2: 0.0
-      seed: 42
+      seed: null  # 使用null让系统自动生成随机种子，避免每次结果完全相同
       verbose: -1
     expected_performance:
       ic: 0.08
@@ -158,7 +158,7 @@ templates:
       dropout: 0.3
       activation: "relu"
       weight_decay: 0.0001
-      seed: 42
+      seed: null  # 使用null让系统自动生成随机种子，避免每次结果完全相同
     expected_performance:
       ic: 0.10
       icir: 0.8
@@ -209,7 +209,7 @@ templates:
       min_data_in_leaf: 50
       lambda_l1: 0.1
       lambda_l2: 0.1
-      seed: 42
+      seed: null  # 使用null让系统自动生成随机种子，避免每次结果完全相同
       verbose: -1
     expected_performance:
       ic: 0.06
@@ -261,7 +261,7 @@ templates:
       min_data_in_leaf: 10
       lambda_l1: 0.0
       lambda_l2: 0.0
-      seed: 42
+      seed: null  # 使用null让系统自动生成随机种子，避免每次结果完全相同
       verbose: -1
     expected_performance:
       ic: 0.10
