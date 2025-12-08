@@ -1,0 +1,29 @@
+{
+  "current_step": 0,
+  "completed_steps": [
+    0
+  ],
+  "market": "CN",
+  "market_name": "中国市场 (A股) / China Market (A-shares)",
+  "asset_type": "stock",
+  "asset_type_name": "股票 / Stocks",
+  "recommended_assets": [],
+  "selected_assets": [],
+  "target_return": null,
+  "risk_preference": null,
+  "simulation_days": null,
+  "optimized_strategy": null,
+  "model_id": null,
+  "training_result": null,
+  "backtest_result": null,
+  "simulation_session_id": null,
+  "simulation_result": null,
+  "initial_capital": null,
+  "broker": null,
+  "risk_controls": null,
+  "trading_session_id": null,
+  "report_schedule": null,
+  "created_at": "2025-12-08T07:15:46.231272",
+  "updated_at": "2025-12-08T07:15:46.960822",
+  "workflow_id": "workflow_20251208_071546"
+}
